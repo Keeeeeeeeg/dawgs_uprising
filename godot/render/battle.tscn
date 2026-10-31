@@ -1,0 +1,45 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://render/battle.gd" id="1_battle"]
+[ext_resource type="PackedScene" path="res://render/hud.tscn" id="2_hud"]
+
+[sub_resource type="Environment" id="Env"]
+background_mode = 1
+background_color = Color(0.42, 0.4, 0.36, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.52, 0.48, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 3
+tonemap_exposure = 0.8
+fog_enabled = true
+fog_light_color = Color(0.48, 0.44, 0.38, 1)
+fog_density = 0.004
+
+[sub_resource type="StandardMaterial3D" id="GroundMat"]
+albedo_color = Color(0.36, 0.34, 0.26, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="GroundMesh"]
+material = SubResource("GroundMat")
+size = Vector2(200, 200)
+
+[node name="Battle" type="Node3D"]
+script = ExtResource("1_battle")
+
+[node name="World" type="WorldEnvironment" parent="."]
+environment = SubResource("Env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.9, 0.6, 0)
+light_color = Color(1, 0.94, 0.84, 1)
+shadow_enabled = true
+
+[node name="Camera" type="Camera3D" parent="."]
+position = Vector3(0, 60, 45)
+rotation = Vector3(-0.9273, 0, 0)
+fov = 50.0
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("GroundMesh")
+
+[node name="Hud" parent="." instance=ExtResource("2_hud")]

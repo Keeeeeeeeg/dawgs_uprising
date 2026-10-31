@@ -43,7 +43,17 @@ web/      The original single-file HTML game, kept for reference
 | `render/` | Renderer and HUD script | Reads SIM state, draws it. Never changes the SIM directly; sends commands. |
 | `menus/` | Menus and campaign script | Main menu, battle setup, campaign, settings, changelog. |
 | `data/` | `BALANCE` | `balance.json` plus `version.json` (version and changelog). |
-| `tests/` | Node headless harness | Headless SIM checks (`godot --headless`). |
+| `tests/` | Node headless harness | Headless SIM checks (see below). |
+
+Other folders: `web/` holds the web game the port is based on (v22.3), and `tools/extract_balance.js` regenerates balance numbers from it without running it.
+
+**Run the tests:** open `tests/run_tests.tscn` and press **F6**, or from the repo root:
+```
+godot --headless --path godot res://tests/run_tests.tscn
+```
+It prints `TESTS PASSED n/n` when everything is fine. Run it before every push.
+
+**Commit the `.uid` files.** Godot 4.7 writes a `something.gd.uid` next to each script the first time it opens the project. They belong in git; `.godot/` does not.
 
 ## Port status
 

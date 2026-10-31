@@ -1,0 +1,1920 @@
+{
+ "_about": "Every gameplay number. Ported from BALANCE in the web game v22.3 (tools/extract_balance.js). 'engine' holds the SIM's fixed-step timing, added for the Godot port.",
+ "engine": {
+  "step": 0.03333333333333333,
+  "maxFrame": 0.25
+ },
+ "units": {
+  "carrier": {
+   "name": "Aircraft Carrier",
+   "hot": "",
+   "cost": 0,
+   "mp": 0,
+   "hp": 10000,
+   "speed": 2.6,
+   "range": 34,
+   "minR": 0,
+   "dmg": 20,
+   "rof": 0.8,
+   "acc": 0.72,
+   "splash": 1.5,
+   "weapon": "shipgun",
+   "armor": "boat",
+   "build": 0,
+   "naval": true,
+   "carrier": true,
+   "noRecruit": true,
+   "guns": 5
+  },
+  "rifle": {
+   "name": "Rifleman",
+   "hot": "Z",
+   "cost": 20,
+   "mp": 1,
+   "hp": 45,
+   "speed": 5.4,
+   "range": 15,
+   "minR": 0,
+   "dmg": 6,
+   "rof": 1.1,
+   "acc": 0.7,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "inf",
+   "build": 9
+  },
+  "mg": {
+   "name": "Machine Gunner",
+   "hot": "X",
+   "cost": 30,
+   "mp": 1,
+   "hp": 55,
+   "speed": 4.7,
+   "range": 17,
+   "minR": 0,
+   "dmg": 2.6,
+   "rof": 0.2,
+   "acc": 0.5,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "inf",
+   "build": 11
+  },
+  "at": {
+   "name": "Rocketeer",
+   "hot": "C",
+   "cost": 45,
+   "mp": 1,
+   "hp": 40,
+   "speed": 5,
+   "range": 21,
+   "minR": 0,
+   "dmg": 55,
+   "rof": 3.6,
+   "acc": 0.78,
+   "splash": 2,
+   "weapon": "rocket",
+   "armor": "inf",
+   "build": 14
+  },
+  "rover": {
+   "name": "Construction Rover",
+   "hot": "E",
+   "cost": 120,
+   "mp": 1,
+   "hp": 260,
+   "speed": 7.5,
+   "range": 0,
+   "minR": 0,
+   "dmg": 0,
+   "rof": 1,
+   "acc": 0,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "veh",
+   "build": 20,
+   "builder": true
+  },
+  "tech": {
+   "name": "Technical",
+   "hot": "V",
+   "cost": 80,
+   "mp": 2,
+   "hp": 190,
+   "speed": 10.5,
+   "range": 18,
+   "minR": 0,
+   "dmg": 3.6,
+   "rof": 0.17,
+   "acc": 0.5,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "veh",
+   "build": 20
+  },
+  "ltank": {
+   "name": "Light Tank",
+   "hot": "B",
+   "cost": 110,
+   "mp": 2,
+   "hp": 300,
+   "speed": 10,
+   "range": 19,
+   "minR": 0,
+   "dmg": 9,
+   "rof": 0.5,
+   "acc": 0.75,
+   "splash": 0,
+   "weapon": "autocannon",
+   "armor": "veh",
+   "build": 24,
+   "front": 0.9,
+   "rear": 1.35
+  },
+  "mtank": {
+   "name": "Medium Tank",
+   "hot": "N",
+   "cost": 200,
+   "mp": 3,
+   "hp": 650,
+   "speed": 6.4,
+   "range": 23,
+   "minR": 0,
+   "dmg": 60,
+   "rof": 2.6,
+   "acc": 0.85,
+   "splash": 3,
+   "weapon": "shell",
+   "armor": "veh",
+   "build": 34,
+   "front": 0.8,
+   "rear": 1.4
+  },
+  "htank": {
+   "name": "Heavy Tank",
+   "hot": "J",
+   "cost": 330,
+   "mp": 4,
+   "hp": 1300,
+   "speed": 4.2,
+   "range": 25,
+   "minR": 0,
+   "dmg": 120,
+   "rof": 3.8,
+   "acc": 0.85,
+   "splash": 2,
+   "weapon": "apshell",
+   "armor": "hvy",
+   "build": 50,
+   "front": 0.7,
+   "rear": 1.5
+  },
+  "spg": {
+   "name": "SPG",
+   "hot": "K",
+   "cost": 150,
+   "mp": 2,
+   "hp": 230,
+   "speed": 7.5,
+   "range": 31,
+   "minR": 0,
+   "dmg": 38,
+   "rof": 3.2,
+   "acc": 0.8,
+   "splash": 2.5,
+   "weapon": "shell",
+   "armor": "veh",
+   "build": 30,
+   "deploy": 1,
+   "front": 0.9,
+   "rear": 1.3
+  },
+  "how": {
+   "name": "Howitzer",
+   "hot": "L",
+   "cost": 170,
+   "mp": 2,
+   "hp": 110,
+   "speed": 3.2,
+   "range": 46,
+   "minR": 13,
+   "dmg": 95,
+   "rof": 6.5,
+   "acc": 0.65,
+   "splash": 5.5,
+   "weapon": "artillery",
+   "armor": "veh",
+   "build": 40
+  },
+  "heli": {
+   "name": "Heavy Helicopter",
+   "hot": "U",
+   "cost": 200,
+   "mp": 2,
+   "hp": 300,
+   "speed": 12,
+   "range": 20,
+   "minR": 0,
+   "dmg": 15,
+   "rof": 0.75,
+   "acc": 0.75,
+   "splash": 1.5,
+   "weapon": "hrocket",
+   "armor": "air",
+   "build": 40,
+   "air": true
+  },
+  "lheli": {
+   "name": "Light Helicopter",
+   "hot": "\u21e7U",
+   "cost": 110,
+   "mp": 1,
+   "hp": 150,
+   "speed": 17,
+   "range": 18,
+   "minR": 0,
+   "dmg": 3,
+   "rof": 0.18,
+   "acc": 0.55,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "air",
+   "build": 24,
+   "air": true
+  },
+  "boat": {
+   "name": "Gunboat",
+   "hot": "Y",
+   "cost": 180,
+   "mp": 2,
+   "hp": 420,
+   "speed": 8,
+   "range": 30,
+   "minR": 0,
+   "dmg": 45,
+   "rof": 2.5,
+   "acc": 0.75,
+   "splash": 2.5,
+   "weapon": "shell",
+   "armor": "boat",
+   "build": 36,
+   "req": "dockyard",
+   "naval": true
+  },
+  "monitor": {
+   "name": "Monitor",
+   "hot": "O",
+   "cost": 300,
+   "mp": 3,
+   "hp": 1100,
+   "speed": 5,
+   "range": 40,
+   "minR": 0,
+   "dmg": 110,
+   "rof": 4.5,
+   "acc": 0.75,
+   "splash": 4,
+   "weapon": "shell",
+   "armor": "boat",
+   "build": 52,
+   "req": "dockyard",
+   "naval": true
+  },
+  "flak": {
+   "name": "Light Anti-Air Vehicle",
+   "hot": "\u21e7T",
+   "cost": 70,
+   "mp": 1,
+   "hp": 160,
+   "speed": 9.5,
+   "range": 26,
+   "minR": 0,
+   "dmg": 14,
+   "rof": 0.3,
+   "acc": 0.8,
+   "splash": 3.5,
+   "weapon": "flak",
+   "armor": "veh",
+   "build": 18,
+   "airOnly": true
+  },
+  "sam": {
+   "name": "Heavy Anti-Air Vehicle",
+   "hot": "R",
+   "cost": 240,
+   "mp": 3,
+   "hp": 420,
+   "speed": 6,
+   "range": 50,
+   "minR": 0,
+   "dmg": 230,
+   "rof": 2.8,
+   "acc": 0.85,
+   "splash": 0,
+   "weapon": "sam",
+   "armor": "veh",
+   "build": 36,
+   "volley": 2,
+   "airOnly": true
+  },
+  "bld": {
+   "name": "Building",
+   "hot": "",
+   "cost": 0,
+   "mp": 0,
+   "hp": 400,
+   "speed": 0,
+   "range": 0,
+   "minR": 0,
+   "dmg": 0,
+   "rof": 9,
+   "acc": 0,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "struct",
+   "build": 0,
+   "static": true,
+   "noRecruit": true,
+   "struct": true
+  },
+  "pillbox": {
+   "name": "Pillbox",
+   "hot": "",
+   "cost": 0,
+   "mp": 0,
+   "hp": 520,
+   "speed": 0,
+   "range": 21,
+   "minR": 0,
+   "dmg": 4,
+   "rof": 0.2,
+   "acc": 0.55,
+   "splash": 0,
+   "weapon": "bullet",
+   "armor": "struct",
+   "build": 0,
+   "static": true,
+   "noRecruit": true
+  },
+  "flamer": {
+   "name": "Flamethrower",
+   "hot": "",
+   "cost": 0,
+   "mp": 0,
+   "hp": 460,
+   "speed": 0,
+   "range": 11,
+   "minR": 0,
+   "dmg": 7,
+   "rof": 0.2,
+   "acc": 0.95,
+   "splash": 2.2,
+   "weapon": "flame",
+   "armor": "struct",
+   "build": 0,
+   "static": true,
+   "noRecruit": true
+  },
+  "aagun": {
+   "name": "AA Emplacement",
+   "hot": "",
+   "cost": 0,
+   "mp": 0,
+   "hp": 380,
+   "speed": 0,
+   "range": 38,
+   "minR": 0,
+   "dmg": 70,
+   "rof": 0.7,
+   "acc": 0.8,
+   "splash": 0,
+   "weapon": "aa",
+   "armor": "struct",
+   "build": 0,
+   "static": true,
+   "noRecruit": true,
+   "airOnly": true
+  },
+  "intc": {
+   "name": "Interceptor",
+   "hot": "",
+   "cost": 160,
+   "mp": 2,
+   "hp": 180,
+   "speed": 30,
+   "range": 22,
+   "minR": 0,
+   "dmg": 65,
+   "rof": 0.55,
+   "acc": 0.8,
+   "splash": 0,
+   "weapon": "aam",
+   "armor": "plane",
+   "build": 30,
+   "plane": true,
+   "noRecruit": true,
+   "turn": 2.2,
+   "ammo": 14,
+   "sortie": 60,
+   "rearm": 16,
+   "evasive": 0.08,
+   "patrol": 110
+  },
+  "cas": {
+   "name": "Close Air Support",
+   "hot": "",
+   "cost": 210,
+   "mp": 2,
+   "hp": 285,
+   "speed": 20,
+   "range": 16,
+   "minR": 0,
+   "dmg": 28,
+   "rof": 0.22,
+   "acc": 0.75,
+   "splash": 1.5,
+   "weapon": "cas",
+   "armor": "plane",
+   "build": 34,
+   "plane": true,
+   "noRecruit": true,
+   "turn": 1.6,
+   "ammo": 14,
+   "sortie": 50,
+   "rearm": 24,
+   "support": 34
+  },
+  "airship": {
+   "name": "Heavy Airship",
+   "hot": "",
+   "cost": 1400,
+   "mp": 8,
+   "hp": 9000,
+   "speed": 2.8,
+   "range": 32,
+   "minR": 0,
+   "dmg": 26,
+   "rof": 0.9,
+   "acc": 0.7,
+   "splash": 2,
+   "weapon": "shipgun",
+   "armor": "ship",
+   "build": 90,
+   "air": true,
+   "req": "helipad",
+   "mega": true,
+   "guns": 5,
+   "alt": 14,
+   "repair": 0.004
+  },
+  "bomb": {
+   "name": "Strategic Bomber",
+   "hot": "",
+   "cost": 320,
+   "mp": 3,
+   "hp": 525,
+   "speed": 14,
+   "range": 0,
+   "minR": 0,
+   "dmg": 130,
+   "rof": 0.3,
+   "acc": 1,
+   "splash": 6,
+   "weapon": "bomb",
+   "armor": "hair",
+   "build": 48,
+   "plane": true,
+   "noRecruit": true,
+   "turn": 0.9,
+   "ammo": 8,
+   "sortie": 90,
+   "rearm": 55,
+   "facilityDown": 40
+  }
+ },
+ "weapons": {
+  "bullet": {
+   "inf": 1,
+   "veh": 0.14,
+   "hvy": 0.05,
+   "air": 0.3,
+   "plane": 0.18,
+   "hair": 0.08,
+   "boat": 0.2,
+   "struct": 0.1,
+   "ship": 0.02,
+   "speed": 75
+  },
+  "autocannon": {
+   "inf": 0.9,
+   "veh": 0.45,
+   "hvy": 0.15,
+   "air": 0.3,
+   "plane": 0.2,
+   "hair": 0.1,
+   "boat": 0.4,
+   "struct": 0.35,
+   "ship": 0.12,
+   "speed": 65
+  },
+  "rocket": {
+   "inf": 0.45,
+   "veh": 1.6,
+   "hvy": 2.4,
+   "air": 1.3,
+   "plane": 0.45,
+   "hair": 0.4,
+   "boat": 1.4,
+   "struct": 1.4,
+   "ship": 0.55,
+   "speed": 30
+  },
+  "shell": {
+   "inf": 0.8,
+   "veh": 1.25,
+   "hvy": 0.9,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 1,
+   "struct": 1.2,
+   "ship": 0,
+   "speed": 50
+  },
+  "apshell": {
+   "inf": 0.4,
+   "veh": 1.35,
+   "hvy": 1,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 1.1,
+   "struct": 1,
+   "ship": 0,
+   "speed": 60
+  },
+  "hrocket": {
+   "inf": 0.9,
+   "veh": 1,
+   "hvy": 0.8,
+   "air": 0.6,
+   "plane": 0.5,
+   "hair": 0.35,
+   "boat": 1.1,
+   "struct": 0.8,
+   "ship": 0.45,
+   "speed": 55
+  },
+  "artillery": {
+   "inf": 1,
+   "veh": 0.9,
+   "hvy": 0.6,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 0.9,
+   "struct": 1.3,
+   "ship": 0,
+   "speed": 26
+  },
+  "aam": {
+   "inf": 0.02,
+   "veh": 0.01,
+   "hvy": 0,
+   "air": 1,
+   "plane": 1,
+   "hair": 0.9,
+   "boat": 0,
+   "struct": 0,
+   "ship": 0.6,
+   "speed": 90,
+   "homing": true
+  },
+  "cas": {
+   "inf": 1,
+   "veh": 0.9,
+   "hvy": 0.25,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 0.8,
+   "struct": 0.7,
+   "ship": 0,
+   "speed": 70
+  },
+  "bomb": {
+   "inf": 0.8,
+   "veh": 1,
+   "hvy": 0.8,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 0.8,
+   "struct": 2.6,
+   "ship": 0,
+   "speed": 0
+  },
+  "flak": {
+   "inf": 0,
+   "veh": 0,
+   "hvy": 0,
+   "air": 0.9,
+   "plane": 0.9,
+   "hair": 0.3,
+   "boat": 0,
+   "struct": 0,
+   "ship": 0.5,
+   "speed": 80,
+   "airburst": true
+  },
+  "sam": {
+   "inf": 0,
+   "veh": 0,
+   "hvy": 0,
+   "air": 1,
+   "plane": 1,
+   "hair": 1.1,
+   "boat": 0,
+   "struct": 0,
+   "ship": 1,
+   "speed": 70,
+   "homing": true
+  },
+  "aa": {
+   "inf": 0,
+   "veh": 0,
+   "hvy": 0,
+   "air": 1,
+   "plane": 1,
+   "hair": 0.9,
+   "boat": 0,
+   "struct": 0,
+   "ship": 0.9,
+   "speed": 85
+  },
+  "flame": {
+   "inf": 1.7,
+   "veh": 0.55,
+   "hvy": 0.25,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 0.4,
+   "struct": 0.5,
+   "ship": 0,
+   "speed": 34
+  },
+  "shipgun": {
+   "inf": 1,
+   "veh": 0.8,
+   "hvy": 0.35,
+   "air": 0.6,
+   "plane": 0.35,
+   "hair": 0.5,
+   "boat": 0.8,
+   "struct": 0.8,
+   "ship": 0.3,
+   "speed": 70
+  },
+  "missile": {
+   "inf": 1,
+   "veh": 1,
+   "hvy": 0.8,
+   "air": 0,
+   "plane": 0,
+   "hair": 0,
+   "boat": 1,
+   "struct": 2.2,
+   "ship": 0,
+   "speed": 0
+  }
+ },
+ "facilities": {
+  "barracks": {
+   "name": "Barracks",
+   "cost": 120,
+   "time": 20,
+   "slot": "mil",
+   "seq": [
+    "rifle",
+    "rifle",
+    "mg",
+    "at"
+   ],
+   "desc": "Trains riflemen, machine gunners and rocketeers."
+  },
+  "motorpool": {
+   "name": "Motor Pool",
+   "cost": 260,
+   "time": 32,
+   "slot": "mil",
+   "seq": [
+    "tech",
+    "ltank",
+    "flak",
+    "mtank",
+    "htank",
+    "sam"
+   ],
+   "desc": "Technicals, all three tanks and both anti-air vehicles, as far as the base allows (medium and heavy tanks and the Heavy Anti-Air Vehicle at Fortresses and HQs)."
+  },
+  "foundry": {
+   "name": "Artillery Foundry",
+   "cost": 340,
+   "time": 38,
+   "slot": "mil",
+   "seq": [
+    "spg",
+    "how"
+   ],
+   "only": [
+    "hq",
+    "fortress"
+   ],
+   "desc": "SPGs and howitzers. Fortresses and HQs only."
+  },
+  "helipad": {
+   "name": "Helipad",
+   "cost": 380,
+   "time": 40,
+   "slot": "mil",
+   "seq": [
+    "lheli",
+    "heli"
+   ],
+   "manual": [
+    "airship"
+   ],
+   "only": [
+    "hq",
+    "fortress"
+   ],
+   "desc": "Light and heavy helicopters, and the Heavy Airship (one per army at a time, ordered by hand). Fortresses and HQs only."
+  },
+  "hangar": {
+   "name": "Hangar",
+   "cost": 450,
+   "time": 45,
+   "slot": "mil",
+   "seq": [
+    "intc",
+    "cas",
+    "bomb"
+   ],
+   "only": [
+    "airbase"
+   ],
+   "planes": 3,
+   "planesUpgraded": 5,
+   "desc": "Builds aircraft and bases 3 more here (5 upgraded). Airbases only."
+  },
+  "dockyard": {
+   "name": "Dockyard",
+   "cost": 240,
+   "time": 30,
+   "slot": "mil",
+   "seq": [
+    "boat",
+    "monitor"
+   ],
+   "port": true,
+   "coastal": true,
+   "desc": "Launches gunboats, and Monitors at a Port Fortress. Port bases only, on a plot by the water."
+  },
+  "depot": {
+   "name": "Supply Depot",
+   "cost": 100,
+   "time": 15,
+   "slot": "eco",
+   "income": 5,
+   "desc": "Adds income. Worth more in a Town."
+  },
+  "market": {
+   "name": "Market",
+   "cost": 160,
+   "time": 20,
+   "slot": "eco",
+   "income": 7,
+   "trade": true,
+   "desc": "Trade stalls. Strong income in Towns, stronger in a Port Town."
+  },
+  "plant": {
+   "name": "Factory",
+   "cost": 220,
+   "time": 28,
+   "slot": "eco",
+   "income": 5,
+   "manpower": 0.6,
+   "desc": "Workshops. Adds income and some manpower."
+  },
+  "housing": {
+   "name": "Housing",
+   "cost": 120,
+   "time": 18,
+   "slot": "eco",
+   "manpower": 1.5,
+   "desc": "Barracks blocks and homes. Adds manpower."
+  },
+  "pillbox": {
+   "name": "Pillbox",
+   "cost": 90,
+   "time": 15,
+   "slot": "fort",
+   "desc": "Machine-gun nest that guards the base. Rockets crack it."
+  },
+  "watchtower": {
+   "name": "Watchtower",
+   "cost": 80,
+   "time": 16,
+   "slot": "fort",
+   "vision": 85,
+   "desc": "Tall lookout with a searchlight: lifts the fog far around it (85 m). Upgrading reaches further."
+  },
+  "radar": {
+   "name": "Radar Station",
+   "cost": 150,
+   "time": 24,
+   "slot": "fort",
+   "radar": 140,
+   "desc": "Spinning dish that picks up every enemy unit within 140 m as an unidentified blip, even under the fog. Knocked out by bombing like other buildings. Upgrading reaches further."
+  },
+  "flamer": {
+   "name": "Flamethrower Emplacement",
+   "cost": 110,
+   "time": 16,
+   "slot": "fort",
+   "desc": "Bunker that blows a jet of fire at enemies who come close. Burns infantry, scorches vehicles."
+  },
+  "aa": {
+   "name": "AA Emplacement",
+   "cost": 70,
+   "time": 15,
+   "slot": "fort",
+   "desc": "Anti-aircraft guns. Hits planes and helicopters only."
+  }
+ },
+ "upgradeCost": 0.8,
+ "upgradeSpeed": 0.65,
+ "upgradeTime": 0.8,
+ "walls": {
+  "types": [
+   "hq",
+   "fortress",
+   "town",
+   "airbase"
+  ],
+  "openR": 7,
+  "holdOpen": 1.2,
+  "rebuild": 45,
+  "rebuildQuiet": 10,
+  "gateHpLevel": [
+   1,
+   1.35,
+   1.7
+  ],
+  "hq": {
+   "half": 13.97,
+   "front": 11.06,
+   "back": -11.06,
+   "gateHalf": 2.52,
+   "thick": 2.06,
+   "inner": 1.1,
+   "gateHp": 3200,
+   "keepDoor": -5.51,
+   "keepTop": 8.65,
+   "keepA": -8.7,
+   "blocks": [
+    [
+     -11.06,
+     -5.6,
+     -4.4,
+     4.4
+    ],
+    [
+     -6,
+     5.6,
+     -14,
+     -10.5
+    ],
+    [
+     -8.1,
+     0.8,
+     11.6,
+     14
+    ],
+    [
+     -11.06,
+     -8.7,
+     -9.2,
+     -4.1
+    ],
+    [
+     -11.06,
+     -8.7,
+     4.1,
+     9.2
+    ]
+   ],
+   "silo": [
+    -5.63,
+    7.76
+   ]
+  },
+  "fortress": {
+   "shape": "oct",
+   "ap": 9.58,
+   "half": 9.58,
+   "front": 9.58,
+   "back": -9.58,
+   "gateHalf": 2.53,
+   "thick": 2.26,
+   "inner": 0.9,
+   "gateHp": 2200,
+   "keepDoor": -4.52,
+   "keepTop": 6,
+   "keepA": -8.38,
+   "blocks": [
+    [
+     -9.58,
+     -4.5,
+     -3.3,
+     3.3
+    ]
+   ]
+  },
+  "town": {
+   "shape": "poly",
+   "n": 12,
+   "ap": 11.6,
+   "half": 11.6,
+   "front": 11.6,
+   "back": -11.6,
+   "gateHalf": 2.2,
+   "thick": 1,
+   "inner": 2,
+   "gateHp": 900,
+   "light": true,
+   "barrierH": 1.25,
+   "fat": {
+    "faces": [
+     1,
+     4,
+     8,
+     11
+    ],
+    "in": 2.2,
+    "out": 1.5
+   },
+   "blocks": [
+    [
+     -7.6,
+     -4.4,
+     3.2,
+     6.8
+    ],
+    [
+     -7.6,
+     -4.4,
+     -6.8,
+     -3.2
+    ],
+    [
+     -2.6,
+     0.6,
+     6,
+     8.8
+    ],
+    [
+     -2.6,
+     0.6,
+     -8.8,
+     -6
+    ],
+    [
+     6.2,
+     8.6,
+     3.6,
+     5.2
+    ],
+    [
+     6.2,
+     8.6,
+     -5.2,
+     -3.6
+    ]
+   ],
+   "towerH": 3,
+   "towers": [
+    [
+     4.366,
+     8.211,
+     -0.4695,
+     -0.8829
+    ],
+    [
+     4.366,
+     -8.211,
+     -0.4695,
+     0.8829
+    ],
+    [
+     -9.3,
+     0,
+     1,
+     0
+    ]
+   ]
+  },
+  "airbase": {
+   "shape": "rect",
+   "light": true,
+   "barrierH": 1.35,
+   "half": 29,
+   "front": 12.6,
+   "back": -12.4,
+   "gateHalf": 2.4,
+   "thick": 0.9,
+   "inner": 2.1,
+   "gateHp": 1100,
+   "blocks": [
+    [
+     8.6,
+     12.6,
+     3.2,
+     7.6
+    ],
+    [
+     8.6,
+     12.6,
+     -7.6,
+     -3.2
+    ],
+    [
+     7.8,
+     12.6,
+     8.6,
+     14
+    ],
+    [
+     7.8,
+     12.6,
+     15.4,
+     20.8
+    ],
+    [
+     7.8,
+     12.6,
+     -14,
+     -8.6
+    ],
+    [
+     7.8,
+     12.6,
+     -20.8,
+     -15.4
+    ],
+    [
+     0.8,
+     7.2,
+     24,
+     28.4
+    ],
+    [
+     -0.4,
+     1.8,
+     -27.6,
+     -24
+    ]
+   ],
+   "towerH": 3.2,
+   "towers": [
+    [
+     10.8,
+     27.4,
+     0,
+     -1
+    ],
+    [
+     10.8,
+     -27.4,
+     0,
+     1
+    ],
+    [
+     -10.6,
+     27.4,
+     0,
+     -1
+    ],
+    [
+     -10.6,
+     -27.4,
+     0,
+     1
+    ]
+   ]
+  }
+ },
+ "zones": {
+  "hq": {
+   "label": "HQ",
+   "r": 18,
+   "income": 16,
+   "mp": 1,
+   "garrison": 8,
+   "garrisonHp": 1.6,
+   "capMult": 0.45,
+   "value": 3,
+   "slots": {
+    "mil": 5,
+    "eco": 2,
+    "fort": 5
+   },
+   "ecoMult": 1,
+   "heal": 0.06,
+   "repairs": true,
+   "roster": [
+    "rifle",
+    "mg",
+    "at",
+    "tech",
+    "ltank",
+    "mtank",
+    "htank",
+    "spg",
+    "how",
+    "lheli",
+    "heli",
+    "flak",
+    "sam",
+    "airship",
+    "rover"
+   ],
+   "naval": [
+    "boat",
+    "monitor"
+   ],
+   "garrisonSeq": [
+    "rifle",
+    "mg",
+    "at",
+    "rifle",
+    "mg",
+    "at"
+   ],
+   "prod": {
+    "every": 28,
+    "cap": 5,
+    "seq": [
+     "rifle",
+     "mg",
+     "rifle",
+     "at"
+    ]
+   }
+  },
+  "fortress": {
+   "label": "Fortress",
+   "r": 13.5,
+   "income": 5,
+   "mp": 0.6,
+   "garrison": 7,
+   "garrisonHp": 1.5,
+   "capMult": 0.6,
+   "value": 2.4,
+   "slots": {
+    "mil": 4,
+    "eco": 1,
+    "fort": 5
+   },
+   "ecoMult": 0.8,
+   "heal": 0.06,
+   "repairs": true,
+   "roster": [
+    "rifle",
+    "mg",
+    "at",
+    "tech",
+    "ltank",
+    "mtank",
+    "htank",
+    "spg",
+    "how",
+    "lheli",
+    "heli",
+    "flak",
+    "sam",
+    "airship",
+    "rover"
+   ],
+   "naval": [
+    "boat",
+    "monitor"
+   ],
+   "garrisonSeq": [
+    "rifle",
+    "mg",
+    "at",
+    "rifle",
+    "mg",
+    "at"
+   ],
+   "prod": {
+    "every": 48,
+    "cap": 4,
+    "seq": [
+     "rifle",
+     "mg",
+     "at",
+     "ltank"
+    ]
+   }
+  },
+  "town": {
+   "label": "Town",
+   "r": 10,
+   "income": 13,
+   "mp": 2.5,
+   "garrison": 3,
+   "garrisonHp": 1,
+   "capMult": 1.1,
+   "value": 1.8,
+   "slots": {
+    "mil": 3,
+    "eco": 4,
+    "fort": 2
+   },
+   "ecoMult": 1.4,
+   "heal": 0.035,
+   "repairs": false,
+   "roster": [
+    "rifle",
+    "mg",
+    "at",
+    "tech",
+    "ltank",
+    "flak",
+    "rover"
+   ],
+   "naval": [
+    "boat"
+   ],
+   "garrisonSeq": [
+    "rifle",
+    "mg",
+    "rifle"
+   ],
+   "prod": {
+    "every": 35,
+    "cap": 3,
+    "seq": [
+     "rifle",
+     "rifle",
+     "mg"
+    ]
+   }
+  },
+  "airbase": {
+   "label": "Airbase",
+   "r": 13,
+   "income": 9,
+   "mp": 1,
+   "garrison": 5,
+   "garrisonHp": 1.25,
+   "capMult": 0.8,
+   "value": 2.2,
+   "slots": {
+    "mil": 2,
+    "eco": 1,
+    "fort": 3
+   },
+   "ecoMult": 1,
+   "heal": 0.045,
+   "repairs": true,
+   "roster": [
+    "rifle",
+    "mg",
+    "flak",
+    "intc",
+    "cas",
+    "bomb",
+    "rover"
+   ],
+   "naval": [],
+   "garrisonSeq": [
+    "rifle",
+    "mg",
+    "rifle",
+    "at",
+    "mg"
+   ],
+   "prod": {
+    "every": 45,
+    "cap": 2,
+    "seq": [
+     "rifle",
+     "mg",
+     "flak"
+    ]
+   },
+   "planes": 2,
+   "terminals": 3,
+   "runway": 44
+  }
+ },
+ "port": {
+  "fortressFortSlots": 2,
+  "tradeMult": 1.25
+ },
+ "mapMix": {
+  "airbase": 0.16,
+  "minAirbases": 2,
+  "fortress": 0.34,
+  "minPorts": 2,
+  "portWater": -0.12,
+  "portReachMin": 6,
+  "portReachMax": 28,
+  "portFallbackReach": 40
+ },
+ "unitCap": 300,
+ "aiUnitCap": 260,
+ "missile": {
+  "siloCost": 1800,
+  "siloTime": 90,
+  "launchDelay": 4.5,
+  "aiSiloAfter": 480,
+  "every": 180,
+  "max": 2,
+  "dmg": 650,
+  "splash": 13,
+  "flightBase": 5,
+  "flightSpeed": 70,
+  "facilityDown": 45,
+  "aiMinScore": 7,
+  "aiEvery": 3,
+  "aiCandidates": 90,
+  "aiAim": 0.85,
+  "aiWeights": {
+   "inf": 1,
+   "veh": 2,
+   "hvy": 3,
+   "boat": 2,
+   "struct": 2
+  },
+  "facilityValue": 2,
+  "aiOwnMax": 4,
+  "aiGrace": 0.6,
+  "aiJitter": 3,
+  "aiMinScoreReckless": 3
+ },
+ "retaliate": {
+  "leash": 65,
+  "garrisonLeash": 45,
+  "memory": 8,
+  "alertR": 20,
+  "idleLeash": 20,
+  "garrisonPad": 14,
+  "alertEvery": 2,
+  "alertRefresh": 0.5,
+  "boatReach": 25
+ },
+ "guard": {
+  "every": 1,
+  "pad": 3,
+  "lead": 1.5,
+  "radius": 45,
+  "leash": 60,
+  "slack": 5
+ },
+ "carrier": {
+  "speed": 3,
+  "hangars": 2,
+  "seq": [
+   "intc",
+   "cas",
+   "intc",
+   "bomb",
+   "cas"
+  ],
+  "maxPlanes": 24,
+  "maxBoats": 10,
+  "startPlanes": 4,
+  "startBoats": 2,
+  "deckSpots": 10,
+  "deck": 2.9,
+  "deckFrom": -11,
+  "deckTo": 9,
+  "deckSide": 2.2,
+  "launchGap": 0.35,
+  "catchR": 9,
+  "rearmSpeed": 3,
+  "scrambleR": 180,
+  "scramblePatch": 0.6,
+  "airCover": 220,
+  "coverAhead": 70,
+  "casCarrierBias": 0.6,
+  "boatOffset": 20,
+  "startX": 0.36,
+  "spacing": 120,
+  "aiStandoff": 260,
+  "aiStep": 90,
+  "aiMoveEvery": 9,
+  "aiWeave": 50,
+  "aiWave": 3,
+  "names": [
+   "Resolute",
+   "Valiant",
+   "Tempest",
+   "Bulwark",
+   "Leviathan",
+   "Vigilant",
+   "Sovereign",
+   "Gauntlet",
+   "Indomitable",
+   "Tenacious"
+  ]
+ },
+ "start": {
+  "money": {
+   "player": 160,
+   "ai": 260
+  },
+  "manpower": 12,
+  "squad": [
+   "rifle",
+   "rifle",
+   "rifle",
+   "rifle",
+   "mg",
+   "at",
+   "rover"
+  ],
+  "facilities": [
+   "barracks",
+   "depot"
+  ],
+  "facilityFirst": 20,
+  "facilityStagger": 5,
+  "airshipDist": 12,
+  "zoneProdMin": 0.4,
+  "zoneProdSpread": 0.5,
+  "aiThink": 2,
+  "aiThinkStagger": 0.7,
+  "aiWave": 22,
+  "aiWaveStagger": 5,
+  "airbaseHangar": true
+ },
+ "aggro": {
+  "start": 12,
+  "startSpread": 14,
+  "floor": 10,
+  "decay": 0.006,
+  "killVeh": 3,
+  "killInf": 0.9,
+  "zoneLoss": 7
+ },
+ "economy": {
+  "incomeDiv": 10,
+  "manpowerDiv": 12,
+  "aiOverBase": 1.3,
+  "aiOverPerZone": 0.045,
+  "aiOverMin": 0.5,
+  "aiOverMax": 1.15,
+  "aiUnderdogZones": 4,
+  "aiUnderdogBonus": 2,
+  "aiStipend": 0.8
+ },
+ "capture": {
+  "base": 3,
+  "perUnit": 2.2,
+  "maxUnits": 6,
+  "rivalDrain": 25,
+  "decay": 8,
+  "threatPause": 6
+ },
+ "heal": {
+  "delay": 5,
+  "reach": 6,
+  "hospitalMult": 3,
+  "hospitalReach": 14,
+  "naval": 0.05,
+  "portReach": 26,
+  "hospitalCost": 140,
+  "hospitalTime": 20
+ },
+ "drill": {
+  "slow": 1.6,
+  "costs": [
+   200,
+   380
+  ],
+  "time": [
+   30,
+   45
+  ],
+  "speed": [
+   1,
+   1.35,
+   1.8
+  ],
+  "capK": [
+   0.5,
+   0.75,
+   1
+  ],
+  "maxCost": [
+   50,
+   135,
+   1000000000
+  ],
+  "militia": [
+   "rifle",
+   "mg"
+  ]
+ },
+ "manning": {
+  "climb": 0.7,
+  "autoEvery": 1,
+  "types": {
+   "fortress": {
+    "armor": 0.6,
+    "cover": 0.75,
+    "range": 1.15
+   },
+   "hq": {
+    "armor": 0.6,
+    "cover": 0.75,
+    "range": 1.15
+   },
+   "airbase": {
+    "armor": 0.72,
+    "cover": 0.82,
+    "range": 1.08
+   },
+   "town": {
+    "armor": 0.8,
+    "cover": 0.85,
+    "range": 1.05
+   }
+  },
+  "airbasePosts": 8,
+  "townPosts": 6
+ },
+ "recruitQ": {
+  "k": 0.5,
+  "max": 6,
+  "walk": 1.9,
+  "drive": 2.5,
+  "rise": 3.2,
+  "lift": 3.2,
+  "float": 1,
+  "door": 0.6,
+  "exitSpeed": 0.9
+ },
+ "production": {
+  "fieldPerFacility": 2,
+  "jitterMin": 0.9,
+  "jitterSpread": 0.2,
+  "afterBuild": 0.5,
+  "afterCapture": 0.7,
+  "zoneAfterCapture": 0.6,
+  "planeReady": 2
+ },
+ "combat": {
+  "acquire": 0.3,
+  "acquireJitter": 0.1,
+  "rofJitterMin": 0.85,
+  "rofJitterSpread": 0.3,
+  "vsVehicleAcc": 1.15,
+  "longRange": 0.7,
+  "longRangeAcc": 0.85,
+  "missScatter": 1,
+  "missSpread": 2.5,
+  "flakScatter": 2.5,
+  "flakSpread": 3,
+  "volleyStagger": 0.18,
+  "chaseStop": 0.85,
+  "minRangeBackoff": 6,
+  "hitRadius": 3,
+  "airHitRadius": 4,
+  "airHitRad": 1.2,
+  "splashFalloff": 0.5,
+  "flakFalloff": 0.6,
+  "heavyFalloff": 0.6,
+  "strikeZoneReach": 30,
+  "strikePad": 3,
+  "frontCos": 0.5,
+  "rearCos": -0.3,
+  "sideMult": 1.1,
+  "raidAlarm": 15
+ },
+ "targeting": {
+  "antiVehOnVeh": 0.35,
+  "antiVehOnInf": 1.6,
+  "gunOnVeh": 1.8,
+  "stickiness": 0.7,
+  "uselessBelow": 0.1,
+  "uselessPenalty": 8
+ },
+ "unitRadius": {
+  "carrier": 9,
+  "ship": 6,
+  "boat": 2.2,
+  "air": 1.8,
+  "hvy": 1.5,
+  "inf": 0.4,
+  "pillbox": 1.9,
+  "how": 1,
+  "plane": 3,
+  "other": 1.15
+ },
+ "sight": {
+  "min": 22,
+  "pad": 6
+ },
+ "vision": {
+  "rifle": 26,
+  "mg": 26,
+  "at": 26,
+  "rover": 24,
+  "tech": 40,
+  "ltank": 34,
+  "mtank": 30,
+  "htank": 28,
+  "spg": 30,
+  "how": 28,
+  "flak": 36,
+  "sam": 42,
+  "heli": 52,
+  "lheli": 66,
+  "flamer": 20,
+  "boat": 38,
+  "monitor": 40,
+  "pillbox": 30,
+  "aagun": 42,
+  "airship": 62,
+  "intc": 80,
+  "cas": 68,
+  "bomb": 60
+ },
+ "flight": {
+  "heliAlt": 7.5,
+  "planeAlt": 16
+ },
+ "upgradedDefenceHp": 1.6,
+ "demolishRefund": {
+  "building": 0.9,
+  "built": 0.4
+ },
+ "buildingHp": {
+  "base": 260,
+  "perCost": 2.2,
+  "lvl2": 1.4
+ },
+ "build": {
+  "radius": 24,
+  "minFromCentre": 3.5,
+  "spacing": 6.4,
+  "roverPerBase": 1,
+  "roverAtHQ": 2,
+  "aiRovers": 3,
+  "stack": 0.6,
+  "reach": 6.5
+ },
+ "orders": {
+  "spacingInf": 1.7,
+  "spacingVeh": 2.5,
+  "sharePath": 25,
+  "airSpread": 1.4,
+  "shipSpread": 3
+ },
+ "air": {
+  "breakOff": 0.4,
+  "manualPatrol": 0.8,
+  "lead": 0.5,
+  "fireCone": 0.4,
+  "casCone": 0.5,
+  "casEgress": 1.6,
+  "casAlert": 4,
+  "casSearchPad": 10,
+  "patrolOrbit": 40,
+  "taxi": 4,
+  "approach": 45,
+  "approachR": 12,
+  "finalSpeed": 0.6,
+  "runwayHold": 3,
+  "holdRadius": 38,
+  "climb": 2.5,
+  "stranded": 25,
+  "parkedHit": 1,
+  "bomberAirbasePref": 2.5
+ },
+ "ai": {
+  "thinkEvery": 2,
+  "waveBase": 5,
+  "waveGrowth": 60,
+  "waveMoney": 350,
+  "waveMax": 24,
+  "maxAttacks": 8,
+  "waveCooldown": 9,
+  "waveCooldownSpread": 8,
+  "waveRetry": 3,
+  "waveWait": 3,
+  "groupTimeout": 600,
+  "groupHold": 6,
+  "attackReach": 420,
+  "qrfReach": 160,
+  "reckless": true,
+  "minAttack": 3,
+  "garrisonRaid": 0.6,
+  "pressOn": true,
+  "pressGarrison": 1,
+  "playerFocus": 1.6,
+  "difficulty": {
+   "easy": {
+    "reckless": false,
+    "pressOn": false,
+    "raid": 0,
+    "focus": 1,
+    "first": 3,
+    "cool": 3,
+    "maxAttacks": 2,
+    "income": 0.7
+   },
+   "normal": {
+    "reckless": true,
+    "pressOn": true,
+    "raid": 0.3,
+    "focus": 1.2,
+    "first": 1.8,
+    "cool": 1.8,
+    "maxAttacks": 4,
+    "income": 1
+   },
+   "hard": {
+    "reckless": true,
+    "pressOn": true,
+    "raid": 0.6,
+    "focus": 1.6,
+    "first": 1,
+    "cool": 1,
+    "maxAttacks": 8,
+    "income": 1
+   }
+  },
+  "qrfPad": 10,
+  "qrfCooldown": 20,
+  "qrfMin": 2,
+  "qrfMax": 12,
+  "qrfPerThreat": 1.2,
+  "qrfVehThreat": 3,
+  "lateGame": 200,
+  "earlyVehicles": 90,
+  "earlyMedium": 140,
+  "aaReact": 3,
+  "aaReactMax": 6,
+  "buildMoney": 420,
+  "buildChance": 0.3,
+  "maxHangars": 2,
+  "buildWeights": {
+   "firstHangar": 2.5,
+   "aa": 0.9,
+   "airbaseAA": 1.6,
+   "dockyard": 2,
+   "depot": 0.12,
+   "market": 0.12,
+   "plant": 0.06,
+   "townEco": 1.5,
+   "pillboxThreat": 0.6,
+   "pillbox": 0.12,
+   "pillboxWindow": 60,
+   "hospital": 0.08,
+   "duplicate": 0.35
+  },
+  "spawnPenalty": 1.4,
+  "shipRetreat": 0.15,
+  "shipRepairTo": 0.6,
+  "shipStart": 90,
+  "shipEscortRange": 320,
+  "shipJitter": 8,
+  "distScale": 115,
+  "distBase": 0.35,
+  "unclaimed": 1.5,
+  "aggroBase": 0.4,
+  "aggroDiv": 28,
+  "leaderExp": 0.9,
+  "revengeWindow": 160,
+  "retake": 3.2,
+  "titForTat": 1.7,
+  "hqDelay": 120,
+  "hqEarly": 0.7,
+  "graceTime": 90,
+  "graceRadius": 105,
+  "grace": 0.5,
+  "playerEarlyTime": 60,
+  "playerEarly": 0.8,
+  "dogpile": 0.85,
+  "garrisonWeight": 0.5,
+  "jitterMin": 0.7,
+  "jitterSpread": 0.6
+ },
+ "campaign": {
+  "defenderPillboxes": 2,
+  "startCredits": 400,
+  "fleetCost": 600,
+  "maxFleets": 3,
+  "planetBase": 40,
+  "capitalBonus": 110,
+  "perTown": 8,
+  "perPort": 5,
+  "fortressDefence": 0.012,
+  "airbaseIntercept": 0.04,
+  "moonAdvantage": {
+   "pillboxes": 3,
+   "aa": 1,
+   "extraUnits": [
+    "rifle",
+    "rifle",
+    "mg",
+    "at",
+    "at",
+    "ltank"
+   ],
+   "enemyFundsMult": 0.5,
+   "autoResolveBonus": 0.15
+  },
+  "bomberWing": {
+   "cost": 450,
+   "max": 2,
+   "reach": 2,
+   "cooldown": 2,
+   "interceptChance": 0.35,
+   "battleFundsMult": 0.5
+  },
+  "bonuses": {
+   "warchest": {
+    "name": "War Chest",
+    "cost": 250,
+    "desc": "+$600 when the battle starts.",
+    "money": 600
+   },
+   "veterans": {
+    "name": "Veteran Platoon",
+    "cost": 300,
+    "desc": "Eight extra infantry at your fortress.",
+    "units": [
+     "rifle",
+     "rifle",
+     "rifle",
+     "rifle",
+     "mg",
+     "mg",
+     "at",
+     "at"
+    ]
+   },
+   "fortify": {
+    "name": "Fortify",
+    "cost": 300,
+    "desc": "Two pillboxes and two AA emplacements around your fortress.",
+    "pillboxes": 2,
+    "aa": 2
+   },
+   "sabotage": {
+    "name": "Sabotage",
+    "cost": 350,
+    "desc": "Enemy starts broke, without its supply depot."
+   },
+   "air": {
+    "name": "Air Support",
+    "cost": 400,
+    "desc": "Two helicopters join you.",
+    "units": [
+     "heli",
+     "heli"
+    ]
+   },
+   "armor": {
+    "name": "Armor Column",
+    "cost": 450,
+    "desc": "Two medium tanks and two light tanks join you.",
+    "units": [
+     "mtank",
+     "mtank",
+     "ltank",
+     "ltank"
+    ]
+   },
+   "artillery": {
+    "name": "Artillery Battery",
+    "cost": 400,
+    "desc": "Two howitzers and an SPG join you.",
+    "units": [
+     "how",
+     "how",
+     "spg"
+    ]
+   }
+  }
+ }
+}

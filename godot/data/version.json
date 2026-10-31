@@ -1,0 +1,19 @@
+{
+ "number": "0.1.0",
+ "name": "Skeleton",
+ "date": "2026-10-31",
+ "webBase": "22.3",
+ "changelog": [
+  {
+   "v": "0.1.0",
+   "by": "Keegan",
+   "name": "Skeleton",
+   "date": "2026-10-31",
+   "changes": [
+    "Godot 4.7.2 project with the web version's split: sim/ (pure logic), render/ (battle view and HUD), menus/.",
+    "Every BALANCE number from web v22.3 is in data/balance.json.",
+    "The SIM runs a fixed 1/30 s step like the web game; the battle screen shows its clock. No units yet."
+   ]
+  }
+ ]
+}
