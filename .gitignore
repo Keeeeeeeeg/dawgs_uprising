@@ -1,0 +1,39 @@
+# Godot 4 editor cache and import data (regenerated on open)
+.godot/
+godot/.godot/
+*.import.tmp
+*.tmp
+
+# Godot exports / builds
+build/
+builds/
+export/
+exports/
+godot/build/
+godot/export/
+*.pck
+*.exe
+*.x86_64
+*.apk
+*.aab
+*.dmg
+*.zip
+
+# Mono / C# (in case it's ever enabled)
+.mono/
+data_*/
+mono_crash.*.json
+
+# Blender backups and autosaves
+*.blend1
+*.blend2
+*.blend@
+*.blend.bak
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
