@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Runs the SIM's checks outside Unity: compiles the same source files Unity uses
        (packages/com.dawgs.sim/Runtime) against plain .NET, with no outside packages.
-       Language level matches Unity 6 (C# 9).   Run:  dotnet run -c Release   (from this folder) -->
+       Language level matches Unity 6 (C# 9). Needs the .NET 10 SDK.   Run:  dotnet run -c Release   (from this folder) -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>

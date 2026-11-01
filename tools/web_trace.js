@@ -1,5 +1,5 @@
-// Golden traces from the web game's SIM, for checking the Godot port against it.
-//   node tools/web_trace.js web/dawgs_uprising_v22.5.html godot/tests/golden
+// Golden traces from the web game's SIM, for checking the port against it.
+//   node tools/web_trace.js web/dawgs_uprising_v22.5.html tests/golden
 // Runs only the SIM script (no DOM, renderer or menus) in Node, steps it in 0.25 s chunks like
 // the web harness, and writes one JSON file per scenario plus rng.json and terrain.json.
 // Re-run it whenever web/ is updated, and commit the new golden files with the port change.

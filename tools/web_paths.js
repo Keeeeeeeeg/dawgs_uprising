@@ -1,6 +1,6 @@
 // Golden pathfinding from the web game: G.findPath on the battle's real ground grid (after setup),
-// for random start/goal pairs, plus the grid itself so the Godot test runs on exactly the same cells.
-//   node tools/web_paths.js web/dawgs_uprising_v22.5.html godot/tests/golden/paths.json
+// for random start/goal pairs, plus the grid itself so the SIM tests run on exactly the same cells.
+//   node tools/web_paths.js web/dawgs_uprising_v22.5.html tests/golden/paths.json
 'use strict';
 const fs = require('fs'), vm = require('vm');
 const [html, out] = process.argv.slice(2);

@@ -18,8 +18,8 @@ namespace DawgsUprising.Sim.Tests
     {
         static int _passed, _failed;
         public static string Root;     // repo root
-        public static string Golden => Path.Combine(Root, "godot", "tests", "golden");
-        public static string Data => Path.Combine(Root, "godot", "data");
+        public static string Golden => Path.Combine(Root, "tests", "golden");
+        public static string Data => Path.Combine(Root, "data");
         public static string SimSource => Path.Combine(Root, "packages", "com.dawgs.sim", "Runtime");
 
         static GameData _game;

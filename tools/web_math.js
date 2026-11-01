@@ -1,6 +1,6 @@
-// Reference results for sim/dmath.gd from V8 itself (run with the same Node as tools/web_trace.js).
-//   node tools/web_math.js godot/tests/golden/math.json
-// Inputs and outputs are stored as 64-bit hex patterns so the Godot test can compare every bit.
+// Reference results for the SIM's DMath from V8 itself (run with the same Node as tools/web_trace.js).
+//   node tools/web_math.js tests/golden/math.json
+// Inputs and outputs are stored as 64-bit hex patterns so the SIM tests can compare every bit.
 'use strict';
 const fs = require('fs');
 const out = process.argv[2];

@@ -1,11 +1,11 @@
-// Export the web game's finished map definitions to godot/data/maps.json, plus an exact
+// Export the web game's finished map definitions to data/maps.json, plus an exact
 // fingerprint for the tests. Runs only the SIM script (no DOM), like tools/web_trace.js.
-//   node tools/export_maps.js web/dawgs_uprising_v22.5.html godot/data/maps.json godot/tests/golden/maps.json
+//   node tools/export_maps.js web/dawgs_uprising_v22.5.html data/maps.json tests/golden/maps.json
 //
-// Numbers that Godot's JSON reader parses exactly (up to 12 significant digits) are written as
+// Numbers that every JSON reader parses exactly (up to 12 significant digits; Godot's was the limit) are written as
 // plain numbers. Longer ones are written as "#<16 hex digits>" (the exact 64-bit pattern); the
-// Godot loader (sim/maps.gd) turns those back into the identical double.
-// Chaos Isles is not exported: it is rolled every battle by sim/maps.gd. The golden file holds
+// SIM's JSON reader (Json.cs) turns those back into the identical double.
+// Chaos Isles is not exported: it is rolled every battle by the SIM (Maps.MakeChaos). The golden file holds
 // web-built Chaos maps for a few seeds so that port can be checked.
 'use strict';
 const fs = require('fs'), vm = require('vm');

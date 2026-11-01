@@ -1,6 +1,6 @@
-// Army profiles -> godot/data/factions.json, and the web SIM's derived tables (UTYPES, ZTYPES,
-// FACILITIES) -> golden file, so sim/tables.gd can be checked against them.
-//   node tools/web_tables.js web/dawgs_uprising_v22.5.html godot/data/factions.json godot/tests/golden/tables.json
+// Army profiles -> data/factions.json, and the web SIM's derived tables (UTYPES, ZTYPES,
+// FACILITIES) -> golden file, so the SIM's Tables can be checked against them.
+//   node tools/web_tables.js web/dawgs_uprising_v22.5.html data/factions.json tests/golden/tables.json
 'use strict';
 const fs = require('fs'), vm = require('vm');
 const [html, outFactions, outGolden] = process.argv.slice(2);

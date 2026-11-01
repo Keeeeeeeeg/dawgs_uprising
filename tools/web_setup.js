@@ -1,7 +1,7 @@
 // Golden battle setup from the web game, captured at checkpoints inside createGame (test-only hooks
 // in a copy of the SIM source; nothing is published). Each checkpoint records how many numbers the
 // battle's random generator has drawn so far, so a port that drifts shows at which step.
-//   node tools/web_setup.js web/dawgs_uprising_v22.5.html godot/tests/golden/setup.json
+//   node tools/web_setup.js web/dawgs_uprising_v22.5.html tests/golden/setup.json
 'use strict';
 const fs = require('fs'), vm = require('vm');
 const [html, out] = process.argv.slice(2);

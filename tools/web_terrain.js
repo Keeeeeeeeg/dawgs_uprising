@@ -1,7 +1,7 @@
 // Golden terrain from the web game: exactly what buildMap() returns for each map, copied at that moment
 // (later setup steps flatten plots, add walls and outskirt props to the same arrays). Test-only hook: a copy of the SIM source gets one extra line that hands the
 // fresh terrain to this script. Nothing is published.
-//   node tools/web_terrain.js web/dawgs_uprising_v22.5.html godot/tests/golden/terrain0.json
+//   node tools/web_terrain.js web/dawgs_uprising_v22.5.html tests/golden/terrain0.json
 // Per map: zonesFinal (after start slots), SHA-256 of the heights (Float32 bytes), passability and
 // water grids, every prop and cove, and 400 sample heights as exact hex for pinpointing differences.
 'use strict';
