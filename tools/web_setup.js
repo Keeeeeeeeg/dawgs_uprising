@@ -13,9 +13,13 @@ const hook = (at, code) => { if (!src.includes(at)) throw new Error('hook point 
 const RND = 'const rnd=mulberry32((opts.rngSeed||seed)^0x9e3779b9);';
 if (!src.includes(RND)) throw new Error('rnd definition not found');
 src = src.replace(RND, 'const __r=mulberry32((opts.rngSeed||seed)^0x9e3779b9);let __rc=0;const rnd=()=>{__rc++;return __r();};globalThis.__cp={};');
+// checkpoint 2: build plots laid out (streets, runways, plots, levelled ground)
+hook('  // ---- buildings: placed by Construction Rovers', "globalThis.__cp.plots={rc:__rc,zones:structuredClone(G.zones.map(z=>({id:z.id,gate:z.gate,budget:z.budget,port:z.port,slots:z.slots,spots:z.spots,air:z.air,cove:z.cove,y:z.y}))),streets:structuredClone(streets),hv:require_sha(hv),pass:require_sha(pass)};\n");
 // checkpoint 1: armies and bases set up (before build plots)
 hook('  // ---- build plots: each base grows', 'globalThis.__cp.zones={rc:__rc,factions:structuredClone(F),zones:structuredClone(G.zones),home:G.home,homes:G.homes.slice()};\n');
-const ctx = { module: { exports: {} }, console, structuredClone };
+const crypto = require('crypto');
+const require_sha = a => crypto.createHash('sha256').update(Buffer.from(a.buffer, a.byteOffset, a.byteLength)).digest('hex');
+const ctx = { module: { exports: {} }, console, structuredClone, require_sha };
 vm.createContext(ctx);
 vm.runInContext(src, ctx, { filename: 'web-sim.js' });
 const SIM = ctx.module.exports;

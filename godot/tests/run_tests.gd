@@ -451,16 +451,37 @@ func _check_setup() -> bool:
 	for name: String in runs:
 		var g: Dictionary = runs[name]
 		var t0 := Time.get_ticks_msec()
-		var sim := SimCore.new(Balance.game_data(), g.opts)
+		var o: Dictionary = g.opts.duplicate()
+		o.snapshots = true
+		var sim := SimCore.new(Balance.game_data(), o)
 		var ms := Time.get_ticks_msec() - t0
 		var cp: Dictionary = Maps._decode(g.checkpoints.zones)
+		var snap: Dictionary = sim.snapshots.zones
 		var problems: Array[String] = []
-		if sim.rnd.draws != int(cp.rc):
-			problems.append("random draws %d, web %d" % [sim.rnd.draws, cp.rc])
-		for pair: Array in [["factions", sim.factions], ["zones", sim.zones], ["home", sim.home], ["homes", sim.homes]]:
+		if snap.rc != int(cp.rc):
+			problems.append("random draws %d, web %d" % [snap.rc, cp.rc])
+		for pair: Array in [["factions", snap.factions], ["zones", snap.zones], ["home", snap.home], ["homes", snap.homes]]:
 			var d := _first_diff(cp[pair[0]], pair[1], pair[0])
 			if not d.is_empty():
 				problems.append(d)
 		_ok(problems.is_empty(), "setup %s: %d armies, %d bases identical to web after %d draws (%.1f s) %s" % [
 			name, sim.factions.size(), sim.zones.size(), int(cp.rc), ms / 1000.0, "; ".join(problems)])
+		# checkpoint 2: build plots (streets, runways, plots, levelled ground)
+		if g.checkpoints.has("plots"):
+			var c2: Dictionary = Maps._decode(g.checkpoints.plots)
+			var p2: Array[String] = []
+			var d2 := _first_diff(c2.zones, sim.zones, "zones")
+			if not d2.is_empty():
+				p2.append(d2)
+			d2 = _first_diff(c2.streets, sim.streets, "streets")
+			if not d2.is_empty():
+				p2.append(d2)
+			if _sha(sim.terrain.hv.to_byte_array()) != c2.hv:
+				p2.append("levelled heights differ")
+			if _sha(sim.terrain.land_grid) != c2.pass:
+				p2.append("walkable grid differs (%d cells)" % _count(sim.terrain.land_grid))
+			var spots := 0
+			for z: Dictionary in sim.zones:
+				spots += (z.get("spots", []) as Array).size()
+			_ok(p2.is_empty(), "setup %s plots: %d streets, %d plots identical to web %s" % [name, sim.streets.size(), spots, "; ".join(p2)])
 	return true

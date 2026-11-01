@@ -20,6 +20,7 @@ const Terrain := preload("res://sim/terrain.gd")
 const Pathing := preload("res://sim/pathing.gd")
 const Spatial := preload("res://sim/spatial.gd")
 const Tables := preload("res://sim/tables.gd")
+const Plots := preload("res://sim/plots.gd")
 
 ## Same events the web SIM emits through on()/emit(): 'shot', 'death', 'zone', 'spawn', 'end', ...
 signal event(name: StringName, a: Variant, b: Variant, c: Variant)
@@ -53,6 +54,9 @@ var units: Array = []          # web G.units
 var home := -1                 # web G.home: the player's HQ zone
 var homes: Array = []          # web G.homes
 var ai_passive := false
+var streets: Array = []       # web G.streets
+var air_corr: Array = []      # web G.airCorr
+var snapshots := {}           # opts.snapshots: copies of the state at each setup checkpoint (tests)
 
 var _step := 0.0
 var _max_frame := 0.0
@@ -108,6 +112,12 @@ func _setup() -> void:
 	tables = Tables.new(balance)
 	_setup_factions(ST)
 	_setup_zones(ST)
+	if opts.get("snapshots", false):
+		snapshots.zones = {"rc": rnd.draws, "factions": factions.duplicate(true), "zones": zones.duplicate(true), "home": home, "homes": homes.duplicate()}
+	var plots := Plots.new(self)
+	plots.run()
+	streets = plots.streets
+	air_corr = plots.air_corr
 
 
 func _difficulty(f: int) -> String:
