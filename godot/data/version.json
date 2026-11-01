@@ -12,7 +12,8 @@
    "changes": [
     "The port now follows web v22.5, which stays frozen until the port is done (the web reference copy is web/dawgs_uprising_v22.5.html).",
     "Balance from v22.4: the light tank fires the new heavy machine gun (weapon 'hmg'); its damage, fire rate and accuracy changed to match.",
-    "Web comparison recordings re-made from v22.5. v22.5 itself only changed camera controls, which the renderer port will pick up."
+    "Web comparison recordings re-made from v22.5. v22.5 itself only changed camera controls, which the renderer port will pick up.",
+    "Tests run from the editor now stay open and show every result in their window (the Output panel could miss the last lines when the run quit straight away)."
    ]
   },
   {

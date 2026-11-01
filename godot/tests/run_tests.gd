@@ -2,7 +2,9 @@ extends Node
 ## Headless checks. Run either way:
 ##   godot --headless --path godot res://tests/run_tests.tscn
 ##   or open tests/run_tests.tscn in the editor and press F6.
-## Prints one line per check and "TESTS PASSED n/n" or "TESTS FAILED"; exits with code 0 or 1.
+## Prints one line per check and "TESTS PASSED n/n" or "TESTS FAILED".
+## Headless: exits with code 0 or 1. From the editor: stays open and shows every line in the window
+## (quitting at once can cut off the editor's Output panel), close it when done.
 
 const SIM_DIR := "res://sim"
 const SimCore := preload("res://sim/sim.gd")
@@ -14,6 +16,7 @@ const UNIT_FIELDS := ["name", "cost", "hp", "speed", "range", "dmg", "rof", "acc
 
 var _passed := 0
 var _failed := 0
+var _lines: PackedStringArray = []
 
 
 func _ready() -> void:
@@ -22,20 +25,36 @@ func _ready() -> void:
 	_check_sim_is_pure()
 	_check_rng_matches_web()
 	var total := _passed + _failed
-	if _failed == 0:
-		print("TESTS PASSED %d/%d" % [_passed, total])
+	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
+	print(summary)
+	_lines.insert(0, summary + "\n")
+	if DisplayServer.get_name() == "headless":
+		get_tree().quit(0 if _failed == 0 else 1)
 	else:
-		print("TESTS FAILED %d of %d" % [_failed, total])
-	get_tree().quit(0 if _failed == 0 else 1)
+		_show(_lines, _failed == 0)
 
 
 func _ok(cond: bool, what: String) -> void:
+	var line := ("  ok   " if cond else "  FAIL ") + what
+	_lines.append(line)
 	if cond:
 		_passed += 1
-		print("  ok   ", what)
+		print(line)
 	else:
 		_failed += 1
-		printerr("  FAIL ", what)
+		printerr(line)
+
+
+## Editor runs: put the results in the window so nothing depends on the Output panel.
+func _show(lines: PackedStringArray, passed: bool) -> void:
+	var text := RichTextLabel.new()
+	text.set_anchors_preset(Control.PRESET_FULL_RECT)
+	text.selection_enabled = true
+	text.add_theme_color_override("default_color", Color.PALE_GREEN if passed else Color.SALMON)
+	text.text = "\n".join(lines) + "\n\n(Select and Ctrl+C to copy. Close this window when done.)"
+	var layer := CanvasLayer.new()
+	layer.add_child(text)
+	add_child(layer)
 
 
 func _check_balance() -> void:
