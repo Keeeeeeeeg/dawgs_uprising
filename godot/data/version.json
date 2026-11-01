@@ -1,9 +1,24 @@
 {
- "number": "0.1.1",
- "name": "Baseline v22.5",
+ "number": "0.2.0",
+ "name": "Solid ground",
  "date": "2026-10-31",
  "webBase": "22.5",
  "changelog": [
+  {
+   "v": "0.2.0",
+   "by": "Keegan",
+   "name": "Solid ground",
+   "date": "2026-10-31",
+   "changes": [
+    "SIM phase 1: the battlefield. Every map, its terrain and pathfinding now work in Godot exactly as in the web game (checked against recordings of web v22.5).",
+    "Exact maths (sim/dmath.gd): sin, cos, atan2, pow, hypot and round give the browser's results bit for bit, on every OS, so battles match the web game and stay in sync between players later.",
+    "Maps: all 20 fixed maps in data/maps.json; Chaos Isles rolls the same map as the web game for the same seed.",
+    "Terrain: heights, coastlines, coves, base pads, walkable ground, boat water and scattered rocks, ruins and wrecks are identical to the web game on all 18 land maps, a team battle and two Chaos battles.",
+    "Pathfinding finds the same routes as the web game (400 recorded paths), plus the spatial lookup units use to find each other, and the unit, base and facility tables.",
+    "Army profiles moved to data/factions.json; map-building numbers to data/mapgen.json.",
+    "Under the hood: Godot's JSON reader and Vector2 lose precision, so long numbers are stored exactly and the SIM never uses Godot vectors. A test that crashes now counts as a failure."
+   ]
+  },
   {
    "v": "0.1.1",
    "by": "Keegan",

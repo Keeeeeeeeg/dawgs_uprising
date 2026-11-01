@@ -2,7 +2,14 @@
  "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). 'engine' holds the SIM's fixed-step timing, added for the Godot port.",
  "engine": {
   "step": 0.03333333333333333,
-  "maxFrame": 0.25
+  "maxFrame": 0.25,
+  "pathStraight": 1,
+  "pathDiag": 1.414,
+  "pathHeuristicDiag": 0.414,
+  "pathHeuristicWeight": 1.05,
+  "losStep": 0.8,
+  "snapRings": 40,
+  "hashBucket": 10
  },
  "units": {
   "carrier": {
@@ -1642,7 +1649,8 @@
  },
  "sight": {
   "min": 22,
-  "pad": 6
+  "pad": 6,
+  "visionExtra": 4
  },
  "vision": {
   "rifle": 26,

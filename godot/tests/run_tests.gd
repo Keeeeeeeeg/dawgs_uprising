@@ -12,6 +12,9 @@ const Rng := preload("res://sim/rng.gd")
 const DMath := preload("res://sim/dmath.gd")
 const Maps := preload("res://sim/maps.gd")
 const Terrain := preload("res://sim/terrain.gd")
+const Pathing := preload("res://sim/pathing.gd")
+const Spatial := preload("res://sim/spatial.gd")
+const Tables := preload("res://sim/tables.gd")
 const GOLDEN := "res://tests/golden" # recorded from the web SIM by tools/web_trace.js
 const CHUNK := 0.25 # matches the web harness: G.update() is stepped in 0.25 s chunks
 const SECONDS := 30.0
@@ -30,6 +33,9 @@ func _ready() -> void:
 	_guard("dmath_matches_v8", _check_dmath_matches_v8)
 	_guard("maps", _check_maps)
 	_guard("terrain", _check_terrain)
+	_guard("pathing", _check_pathing)
+	_guard("spatial", _check_spatial)
+	_guard("tables", _check_tables)
 	var total := _passed + _failed
 	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
 	print(summary)
@@ -123,9 +129,9 @@ func _check_sim_is_pure() -> bool:
 		var base := script.get_instance_base_type()
 		_ok(not ClassDB.is_parent_class(base, "Node"), "sim/%s is not a Node (%s)" % [file, base])
 		var src := FileAccess.get_file_as_string(SIM_DIR.path_join(file))
-		var banned := ["randf(", "randi(", "Balance.", "get_tree(", "Input."]
+		var banned := ["randf(", "randi(", "Balance.", "get_tree(", "Input.", "Vector2", "Vector3"]
 		var found := banned.filter(func(s: String) -> bool: return src.contains(s))
-		_ok(found.is_empty(), "sim/%s uses no globals or unseeded randomness %s" % [file, "" if found.is_empty() else str(found)])
+		_ok(found.is_empty(), "sim/%s uses no globals, unseeded randomness or 32-bit vectors %s" % [file, "" if found.is_empty() else str(found)])
 	return true
 
 
@@ -326,3 +332,110 @@ static func _count(b: PackedByteArray) -> int:
 	for x in b:
 		n += x
 	return n
+
+
+## sim/pathing.gd must find the same paths as the web game's findPath, waypoint for waypoint,
+## on the same ground grid (tests/golden/paths.json, from tools/web_paths.js).
+func _check_pathing() -> bool:
+	var golden := Balance.load_file(GOLDEN.path_join("paths.json"))
+	var runs: Dictionary = golden.get("runs", {})
+	_ok(not runs.is_empty(), "golden paths.json loads (web v%s)" % golden.get("web", "?"))
+	for name: String in runs:
+		var g: Dictionary = runs[name]
+		var fake := {"X0": float(g.X0), "Z0": float(g.Z0), "cell": float(g.CELL), "GW": int(g.GW), "GH": int(g.GH)}
+		var p := Pathing.new(_Dims.new(fake), Balance.data.engine)
+		var grid := Marshalls.base64_to_raw(g.pass)
+		var bad := 0
+		var first := ""
+		var found := 0
+		for q: Array in g.queries:
+			var got: Variant = p.find_path(_hex_float(q[0]), _hex_float(q[1]), _hex_float(q[2]), _hex_float(q[3]), grid)
+			var want: Variant = q[4]
+			var same := (got == null) == (want == null)
+			if same and want != null:
+				found += 1
+				same = (got as Array).size() == (want as Array).size()
+				if same:
+					for k in (want as Array).size():
+						if DMath.bits(got[k][0]) != _hex_bits(want[k][0]) or DMath.bits(got[k][1]) != _hex_bits(want[k][1]):
+							same = false
+							break
+			if not same:
+				bad += 1
+				if first.is_empty():
+					first = " first: query %d, web %s waypoints, port %s" % [g.queries.find(q), "none" if want == null else str((want as Array).size()), "none" if got == null else str((got as Array).size())]
+		_ok(bad == 0, "pathing %s: %d paths identical to web (%d found)%s" % [name, g.queries.size() - bad, found, "" if bad == 0 else " - %d differ;%s" % [bad, first]])
+	return true
+
+
+## Stand-in for a terrain: just the grid's size and position.
+class _Dims:
+	var X0: float
+	var Z0: float
+	var cell: float
+	var GW: int
+	var GH: int
+	func _init(d: Dictionary) -> void:
+		X0 = d.X0
+		Z0 = d.Z0
+		cell = d.cell
+		GW = d.GW
+		GH = d.GH
+
+
+## sim/spatial.gd must find exactly the live units within range, in the web game's visit order.
+func _check_spatial() -> bool:
+	var rng := Rng.new(99)
+	var W := 790.0
+	var H := 450.0
+	var units := []
+	for k in 600:
+		var u := _Dot.new()
+		u.x = -W / 2.0 + rng.next() * W
+		u.z = -H / 2.0 + rng.next() * H
+		u.alive = rng.next() > 0.1
+		units.append(u)
+	var hash := Spatial.new(W, H, -W / 2.0, -H / 2.0, Balance.value("engine.hashBucket"))
+	hash.rebuild(units)
+	var bad := 0
+	for q in 200:
+		var x := -W / 2.0 + rng.next() * W
+		var z := -H / 2.0 + rng.next() * H
+		var r := 5.0 + rng.next() * 60.0
+		var got := []
+		hash.query(x, z, r, func(u: Object, _d2: float) -> void: got.append(u))
+		# expected: bucket rows, then columns, then insertion order (the web visit order)
+		var want := []
+		for j in hash.BH:
+			for i in hash.BW:
+				for u: _Dot in units:
+					if not u.alive:
+						continue
+					var ui := clampi(int(floorf((u.x - hash.X0) / hash.size)), 0, hash.BW - 1)
+					var uj := clampi(int(floorf((u.z - hash.Z0) / hash.size)), 0, hash.BH - 1)
+					if ui == i and uj == j and (u.x - x) * (u.x - x) + (u.z - z) * (u.z - z) <= r * r:
+						want.append(u)
+		if got != want:
+			bad += 1
+	_ok(bad == 0, "spatial hash: 200 range queries over 600 units match a full scan, in web order%s" % ("" if bad == 0 else " (%d differ)" % bad))
+	return true
+
+
+class _Dot:
+	var x := 0.0
+	var z := 0.0
+	var alive := true
+
+
+## sim/tables.gd must build the same unit, zone and facility tables as the web game.
+func _check_tables() -> bool:
+	var golden := Balance.load_file(GOLDEN.path_join("tables.json"))
+	var t := Tables.new(Balance.data)
+	for pair: Array in [["UTYPES", t.utypes], ["ZTYPES", t.ztypes], ["FACILITIES", t.facilities]]:
+		var want: Dictionary = Maps._decode(golden.get(pair[0], {}))
+		var diff := _first_diff(want, pair[1], pair[0])
+		_ok(not want.is_empty() and diff.is_empty() and want.size() == (pair[1] as Dictionary).size(),
+			"%s: %d entries identical to web %s" % [pair[0], want.size(), diff])
+	var fac := Balance.load_file("res://data/factions.json")
+	_ok(fac.has("player") and (fac.get("ai", []) as Array).size() == 15, "factions.json has the player and %d AI armies" % (fac.get("ai", []) as Array).size())
+	return true

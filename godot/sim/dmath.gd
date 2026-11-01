@@ -8,7 +8,8 @@ extends RefCounted
 ## src/builtins/math.tq (Math.hypot, Math.round). Every constant is stored as its exact bit
 ## pattern so it doesn't depend on how Godot parses long decimal literals.
 ##
-## Use these in sim/ instead of sin(), cos(), atan2(), pow(), round() and Vector2.length().
+## Use these in sim/ instead of sin(), cos(), atan2(), pow(), round() and vector lengths. (Godot vectors
+## are 32-bit floats, so the SIM keeps coordinates as plain floats or [x, z] arrays.)
 ## floor, ceil, abs, min, max, sqrt and + - * / are exact everywhere and can be used directly.
 
 const M32 := 0xFFFFFFFF

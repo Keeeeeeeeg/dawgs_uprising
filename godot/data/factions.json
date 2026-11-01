@@ -1,0 +1,467 @@
+{
+ "_about": "Armies from web v22.5 (PLAYER_FACTION + AI_POOL), exported by tools/web_tables.js. comp = unit mix weights, prefer = base types it wants more.",
+ "player": {
+  "name": "Free Militia",
+  "short": "Militia",
+  "color": "#4f9a2c",
+  "css": "#7cc94f",
+  "player": true,
+  "blurb": "You. Green flashes on olive kit. Stubborn."
+ },
+ "ai": [
+  {
+   "name": "Directorate",
+   "short": "Directorate",
+   "color": "#7a5434",
+   "css": "#b08a60",
+   "blurb": "Brown regulars. Medium tanks and solid infantry. Hungry for Towns.",
+   "comp": {
+    "rifle": 0.34,
+    "mg": 0.2,
+    "at": 0.12,
+    "tech": 0.06,
+    "ltank": 0.06,
+    "mtank": 0.12,
+    "htank": 0.03,
+    "spg": 0.03,
+    "how": 0.02,
+    "heli": 0.02,
+    "boat": 0.03,
+    "monitor": 0.01,
+    "flak": 0.03,
+    "sam": 0.02,
+    "air": 0.14,
+    "intc": 0.35,
+    "cas": 0.35,
+    "bomb": 0.3
+   },
+   "prefer": {
+    "town": 1.7
+   }
+  },
+  {
+   "name": "Northern Pact",
+   "short": "Pact",
+   "color": "#a0289a",
+   "css": "#e05ad8",
+   "blurb": "Magenta and methodical. Rocket teams, howitzers and air power. Goes for Airbases.",
+   "comp": {
+    "rifle": 0.32,
+    "mg": 0.14,
+    "at": 0.24,
+    "tech": 0.06,
+    "ltank": 0.04,
+    "mtank": 0.05,
+    "htank": 0,
+    "spg": 0.04,
+    "how": 0.08,
+    "heli": 0.02,
+    "boat": 0.03,
+    "monitor": 0.01,
+    "flak": 0.01,
+    "sam": 0.05,
+    "air": 0.18,
+    "intc": 0.7,
+    "cas": 0.2,
+    "bomb": 0.1
+   },
+   "prefer": {
+    "airbase": 2
+   }
+  },
+  {
+   "name": "Black Tide",
+   "short": "Tide",
+   "color": "#3566c8",
+   "css": "#6f9bff",
+   "blurb": "Blue raiders. Technicals and gunboats, no tanks. Raids Ports.",
+   "comp": {
+    "rifle": 0.34,
+    "mg": 0.16,
+    "at": 0.12,
+    "tech": 0.26,
+    "ltank": 0,
+    "mtank": 0,
+    "htank": 0,
+    "spg": 0.04,
+    "how": 0,
+    "heli": 0,
+    "boat": 0.08,
+    "monitor": 0.04,
+    "flak": 0.05,
+    "sam": 0,
+    "air": 0.1,
+    "intc": 0.6,
+    "cas": 0.4,
+    "bomb": 0
+   },
+   "prefer": {
+    "port": 2
+   }
+  },
+  {
+   "name": "Crimson Legion",
+   "short": "Legion",
+   "color": "#a8382c",
+   "css": "#e8705f",
+   "blurb": "Red shock troops. Heavy tanks and gunships. Storms Fortresses.",
+   "comp": {
+    "rifle": 0.28,
+    "mg": 0.16,
+    "at": 0.1,
+    "tech": 0.04,
+    "ltank": 0.04,
+    "mtank": 0.08,
+    "htank": 0.14,
+    "spg": 0.04,
+    "how": 0.04,
+    "heli": 0.08,
+    "boat": 0.02,
+    "monitor": 0.02,
+    "flak": 0.03,
+    "sam": 0.03,
+    "air": 0.24,
+    "intc": 0.1,
+    "cas": 0.4,
+    "bomb": 0.5
+   },
+   "prefer": {
+    "fortress": 1.8,
+    "hq": 1.3
+   }
+  },
+  {
+   "name": "Rust Company",
+   "short": "Rust",
+   "color": "#c0702a",
+   "css": "#f0a15c",
+   "blurb": "Orange mercenaries. Machine guns and light armor.",
+   "comp": {
+    "rifle": 0.26,
+    "mg": 0.32,
+    "at": 0.12,
+    "tech": 0.08,
+    "ltank": 0.1,
+    "mtank": 0.02,
+    "htank": 0,
+    "spg": 0.07,
+    "how": 0.02,
+    "heli": 0,
+    "boat": 0.03,
+    "monitor": 0,
+    "flak": 0.05,
+    "sam": 0,
+    "air": 0,
+    "intc": 0,
+    "cas": 0,
+    "bomb": 0
+   },
+   "prefer": {
+    "town": 1.3,
+    "fortress": 1.2
+   }
+  },
+  {
+   "name": "Violet Syndicate",
+   "short": "Syndicate",
+   "color": "#7a4fc0",
+   "css": "#b48cf0",
+   "blurb": "Purple specialists. SPGs, howitzers and helicopters. Prizes Ports and Airbases.",
+   "comp": {
+    "rifle": 0.3,
+    "mg": 0.14,
+    "at": 0.14,
+    "tech": 0.05,
+    "ltank": 0.04,
+    "mtank": 0.06,
+    "htank": 0.02,
+    "spg": 0.08,
+    "how": 0.07,
+    "heli": 0.06,
+    "boat": 0.04,
+    "monitor": 0.02,
+    "flak": 0.03,
+    "sam": 0.03,
+    "air": 0.16,
+    "intc": 0.4,
+    "cas": 0.35,
+    "bomb": 0.25
+   },
+   "prefer": {
+    "port": 1.6,
+    "airbase": 1.3
+   }
+  },
+  {
+   "name": "Jade Watch",
+   "short": "Jade",
+   "color": "#2a9a8f",
+   "css": "#4fd1c5",
+   "blurb": "Teal border guards. Dug-in infantry, rocket teams and flak. Holds Fortresses.",
+   "comp": {
+    "rifle": 0.36,
+    "mg": 0.22,
+    "at": 0.18,
+    "tech": 0.04,
+    "ltank": 0.05,
+    "mtank": 0.05,
+    "htank": 0.02,
+    "spg": 0.02,
+    "how": 0.03,
+    "heli": 0.01,
+    "boat": 0.02,
+    "monitor": 0.01,
+    "flak": 0.05,
+    "sam": 0.03,
+    "air": 0.08,
+    "intc": 0.5,
+    "cas": 0.3,
+    "bomb": 0.2
+   },
+   "prefer": {
+    "fortress": 1.6
+   }
+  },
+  {
+   "name": "Rose Brigade",
+   "short": "Rose",
+   "color": "#c04a98",
+   "css": "#f07cc8",
+   "blurb": "Pink raiders. Fast technicals and light tanks. Snaps up Towns.",
+   "comp": {
+    "rifle": 0.3,
+    "mg": 0.16,
+    "at": 0.12,
+    "tech": 0.2,
+    "ltank": 0.1,
+    "mtank": 0.02,
+    "htank": 0,
+    "spg": 0.03,
+    "how": 0,
+    "heli": 0.03,
+    "boat": 0.03,
+    "monitor": 0,
+    "flak": 0.04,
+    "sam": 0.02,
+    "air": 0.1,
+    "intc": 0.5,
+    "cas": 0.5,
+    "bomb": 0
+   },
+   "prefer": {
+    "town": 1.6
+   }
+  },
+  {
+   "name": "Sun Cartel",
+   "short": "Sun",
+   "color": "#c9a520",
+   "css": "#f2d04a",
+   "blurb": "Gold-rich mercenaries. Artillery and air power. Buys Airbases.",
+   "comp": {
+    "rifle": 0.28,
+    "mg": 0.14,
+    "at": 0.16,
+    "tech": 0.06,
+    "ltank": 0.04,
+    "mtank": 0.06,
+    "htank": 0.02,
+    "spg": 0.06,
+    "how": 0.08,
+    "heli": 0.04,
+    "boat": 0.02,
+    "monitor": 0.01,
+    "flak": 0.02,
+    "sam": 0.04,
+    "air": 0.2,
+    "intc": 0.4,
+    "cas": 0.3,
+    "bomb": 0.3
+   },
+   "prefer": {
+    "airbase": 1.8
+   }
+  },
+  {
+   "name": "Frost Wardens",
+   "short": "Frost",
+   "color": "#4a88c8",
+   "css": "#8fc8ff",
+   "blurb": "Sky-blue mountain troops. Infantry, flak and patience. Holds Fortresses.",
+   "comp": {
+    "rifle": 0.38,
+    "mg": 0.22,
+    "at": 0.18,
+    "tech": 0.04,
+    "ltank": 0.04,
+    "mtank": 0.04,
+    "htank": 0.02,
+    "spg": 0.02,
+    "how": 0.03,
+    "heli": 0.01,
+    "boat": 0.02,
+    "monitor": 0.01,
+    "flak": 0.05,
+    "sam": 0.03,
+    "air": 0.06,
+    "intc": 0.6,
+    "cas": 0.4,
+    "bomb": 0
+   },
+   "prefer": {
+    "fortress": 1.7
+   }
+  },
+  {
+   "name": "Ash Battalion",
+   "short": "Ash",
+   "color": "#2e2e2e",
+   "css": "#6e6e6e",
+   "blurb": "Black heavy armour. Tanks first, questions later. Storms HQs.",
+   "comp": {
+    "rifle": 0.24,
+    "mg": 0.14,
+    "at": 0.1,
+    "tech": 0.02,
+    "ltank": 0.06,
+    "mtank": 0.14,
+    "htank": 0.14,
+    "spg": 0.04,
+    "how": 0.03,
+    "heli": 0.04,
+    "boat": 0.02,
+    "monitor": 0.02,
+    "flak": 0.03,
+    "sam": 0.02,
+    "air": 0.12,
+    "intc": 0.2,
+    "cas": 0.5,
+    "bomb": 0.3
+   },
+   "prefer": {
+    "hq": 1.6,
+    "fortress": 1.3
+   }
+  },
+  {
+   "name": "Iron Covenant",
+   "short": "Covenant",
+   "color": "#7a2438",
+   "css": "#b0485e",
+   "blurb": "Maroon zealots. Rocket teams and howitzers. Goes for Fortresses.",
+   "comp": {
+    "rifle": 0.3,
+    "mg": 0.14,
+    "at": 0.22,
+    "tech": 0.04,
+    "ltank": 0.04,
+    "mtank": 0.06,
+    "htank": 0.04,
+    "spg": 0.04,
+    "how": 0.08,
+    "heli": 0.02,
+    "boat": 0.02,
+    "monitor": 0.01,
+    "flak": 0.03,
+    "sam": 0.03,
+    "air": 0.1,
+    "intc": 0.4,
+    "cas": 0.4,
+    "bomb": 0.2
+   },
+   "prefer": {
+    "fortress": 1.5
+   }
+  },
+  {
+   "name": "Marsh Rangers",
+   "short": "Rangers",
+   "color": "#6f7a24",
+   "css": "#a8b04a",
+   "blurb": "Olive skirmishers. Gunboats and riflemen in the shallows. Raids Ports.",
+   "comp": {
+    "rifle": 0.36,
+    "mg": 0.16,
+    "at": 0.12,
+    "tech": 0.1,
+    "ltank": 0.04,
+    "mtank": 0.02,
+    "htank": 0,
+    "spg": 0.03,
+    "how": 0.02,
+    "heli": 0.02,
+    "boat": 0.1,
+    "monitor": 0.03,
+    "flak": 0.04,
+    "sam": 0.02,
+    "air": 0.08,
+    "intc": 0.5,
+    "cas": 0.5,
+    "bomb": 0
+   },
+   "prefer": {
+    "port": 1.8
+   }
+  },
+  {
+   "name": "Storm Corps",
+   "short": "Storm",
+   "color": "#2a3a8a",
+   "css": "#5a6ed0",
+   "blurb": "Navy paratroops. Helicopters and fighters everywhere. Hunts Airbases.",
+   "comp": {
+    "rifle": 0.3,
+    "mg": 0.14,
+    "at": 0.14,
+    "tech": 0.06,
+    "ltank": 0.04,
+    "mtank": 0.06,
+    "htank": 0.02,
+    "spg": 0.03,
+    "how": 0.03,
+    "heli": 0.1,
+    "boat": 0.02,
+    "monitor": 0.01,
+    "flak": 0.02,
+    "sam": 0.05,
+    "air": 0.22,
+    "intc": 0.6,
+    "cas": 0.3,
+    "bomb": 0.1
+   },
+   "prefer": {
+    "airbase": 1.7
+   }
+  },
+  {
+   "name": "Glacier Fleet",
+   "short": "Glacier",
+   "color": "#2a98b0",
+   "css": "#5fd6f0",
+   "blurb": "Cyan sailors. Monitors, gunboats and coastal guns. Lives on the water.",
+   "comp": {
+    "rifle": 0.3,
+    "mg": 0.16,
+    "at": 0.14,
+    "tech": 0.06,
+    "ltank": 0.04,
+    "mtank": 0.04,
+    "htank": 0.02,
+    "spg": 0.04,
+    "how": 0.03,
+    "heli": 0.02,
+    "boat": 0.1,
+    "monitor": 0.06,
+    "flak": 0.03,
+    "sam": 0.02,
+    "air": 0.1,
+    "intc": 0.4,
+    "cas": 0.4,
+    "bomb": 0.2
+   },
+   "prefer": {
+    "port": 2
+   }
+  }
+ ]
+}

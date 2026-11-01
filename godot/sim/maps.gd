@@ -520,8 +520,8 @@ static func battle_zones(m: Dictionary, opts: Dictionary, rnd, gen: Dictionary) 
 		team_of.append(ai[i].get("team", 2) if mode == "teams" else H + i)
 	var sp := []
 	for i: Variant in m.slots:
-		sp.append(Vector2(m.zones[int(i)][2], m.zones[int(i)][3]))
-	var dist := func(a: Vector2, b: Vector2) -> float: return DMath.hypot(a.x - b.x, a.y - b.y)
+		sp.append([float(m.zones[int(i)][2]), float(m.zones[int(i)][3])])
+	var dist := func(a: Array, b: Array) -> float: return DMath.hypot(a[0] - b[0], a[1] - b[1])
 	var slot_of := []
 	slot_of.resize(NF)
 	slot_of.fill(-1)

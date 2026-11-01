@@ -39,10 +39,10 @@ web/      The original single-file HTML game, kept for reference
 
 | Folder | Web version equivalent | Rule |
 |---|---|---|
-| `sim/` | SIM script | Pure logic. `RefCounted` only, no `Node`, deterministic, seeded RNG. |
+| `sim/` | SIM script | Pure logic. `RefCounted` only, no `Node`, deterministic, seeded RNG. Use `dmath.gd` for sin/cos/atan2/pow/hypot/round, and plain floats or `[x, z]` arrays, never `Vector2`/`Vector3` (32-bit). |
 | `render/` | Renderer and HUD script | Reads SIM state, draws it. Never changes the SIM directly; sends commands. |
 | `menus/` | Menus and campaign script | Main menu, battle setup, campaign, settings, changelog. |
-| `data/` | `BALANCE` | `balance.json` plus `version.json` (version and changelog). |
+| `data/` | `BALANCE` and map/army data | `balance.json`, `maps.json`, `mapgen.json`, `factions.json`, `version.json` (version and changelog). |
 | `tests/` | Node headless harness | Headless SIM checks (see below). |
 
 Other folders: `web/` holds the web game the port is based on (v22.5, frozen during the port), and `tools/extract_balance.js` regenerates balance numbers from it without running it.
@@ -59,7 +59,8 @@ It prints `TESTS PASSED n/n` when everything is fine. Run it before every push. 
 
 - [x] Repo, LFS and folder setup
 - [x] Godot project skeleton (30/30 tests pass in Godot 4.7.2) (sim / render / menus / data)
-- [ ] SIM: core loop, units, orders, pathing grid
+- [x] SIM phase 1: exact maths, maps, terrain, pathfinding, spatial hash, unit/base tables (identical to web v22.5)
+- [ ] SIM: core loop, units, orders, movement, combat
 - [ ] SIM: zones, base types, capture, garrisons
 - [ ] SIM: walls, gates, team grids, manning
 - [ ] SIM: air (airbase cycle, carriers), naval
