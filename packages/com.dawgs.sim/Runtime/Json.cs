@@ -24,6 +24,21 @@ namespace DawgsUprising.Sim
         public bool Bool(string k) => _map.TryGetValue(k, out var v) && v is bool b && b;
         public JObj Obj(string k) => _map.TryGetValue(k, out var v) ? v as JObj : null;
         public List<object> Arr(string k) => _map.TryGetValue(k, out var v) ? v as List<object> : null;
+        public int Int(string k) => (int)Num(k);
+        public double[] Nums(string k)
+        {
+            var a = Arr(k);
+            var r = new double[a.Count];
+            for (int i = 0; i < r.Length; i++) r[i] = Convert.ToDouble(a[i], CultureInfo.InvariantCulture);
+            return r;
+        }
+        public string[] Strs(string k)
+        {
+            var a = Arr(k);
+            var r = new string[a.Count];
+            for (int i = 0; i < r.Length; i++) r[i] = (string)a[i];
+            return r;
+        }
     }
 
     /// <summary>
