@@ -36,6 +36,7 @@ func _ready() -> void:
 	_guard("pathing", _check_pathing)
 	_guard("spatial", _check_spatial)
 	_guard("tables", _check_tables)
+	_guard("setup", _check_setup)
 	var total := _passed + _failed
 	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
 	print(summary)
@@ -94,7 +95,7 @@ func _check_balance() -> bool:
 
 
 func _run_sim() -> SimCore:
-	var sim := SimCore.new(Balance.data, {"seed": 7})
+	var sim := SimCore.new({"balance": Balance.data}, {"seed": 7})
 	var t := 0.0
 	while t < SECONDS:
 		sim.update(CHUNK)
@@ -109,7 +110,7 @@ func _check_sim_steps() -> bool:
 	_ok(not a.over, "sim starts and runs")
 	_ok(absf(a.ticks - SECONDS / step) <= 1.0, "%.0f s of play = %d ticks at %.4f s" % [SECONDS, a.ticks, step])
 	_ok(a.state_hash() == b.state_hash(), "two runs, same seed, same state_hash")
-	var capped := SimCore.new(Balance.data, {"seed": 7})
+	var capped := SimCore.new({"balance": Balance.data}, {"seed": 7})
 	capped.update(10.0)
 	var max_frame: float = Balance.value("engine.maxFrame")
 	_ok(capped.time <= max_frame + 1e-9, "one long frame is capped at maxFrame (%.2f s)" % capped.time)
@@ -438,4 +439,28 @@ func _check_tables() -> bool:
 			"%s: %d entries identical to web %s" % [pair[0], want.size(), diff])
 	var fac := Balance.load_file("res://data/factions.json")
 	_ok(fac.has("player") and (fac.get("ai", []) as Array).size() == 15, "factions.json has the player and %d AI armies" % (fac.get("ai", []) as Array).size())
+	return true
+
+
+## Battle setup (sim.gd, the web createGame) must match the web game at each recorded checkpoint,
+## including how many random numbers have been drawn (tests/golden/setup.json, tools/web_setup.js).
+func _check_setup() -> bool:
+	var golden := Balance.load_file(GOLDEN.path_join("setup.json"))
+	var runs: Dictionary = golden.get("runs", {})
+	_ok(not runs.is_empty(), "golden setup.json loads (web v%s)" % golden.get("web", "?"))
+	for name: String in runs:
+		var g: Dictionary = runs[name]
+		var t0 := Time.get_ticks_msec()
+		var sim := SimCore.new(Balance.game_data(), g.opts)
+		var ms := Time.get_ticks_msec() - t0
+		var cp: Dictionary = Maps._decode(g.checkpoints.zones)
+		var problems: Array[String] = []
+		if sim.rnd.draws != int(cp.rc):
+			problems.append("random draws %d, web %d" % [sim.rnd.draws, cp.rc])
+		for pair: Array in [["factions", sim.factions], ["zones", sim.zones], ["home", sim.home], ["homes", sim.homes]]:
+			var d := _first_diff(cp[pair[0]], pair[1], pair[0])
+			if not d.is_empty():
+				problems.append(d)
+		_ok(problems.is_empty(), "setup %s: %d armies, %d bases identical to web after %d draws (%.1f s) %s" % [
+			name, sim.factions.size(), sim.zones.size(), int(cp.rc), ms / 1000.0, "; ".join(problems)])
 	return true

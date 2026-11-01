@@ -1,0 +1,42 @@
+// Golden battle setup from the web game, captured at checkpoints inside createGame (test-only hooks
+// in a copy of the SIM source; nothing is published). Each checkpoint records how many numbers the
+// battle's random generator has drawn so far, so a port that drifts shows at which step.
+//   node tools/web_setup.js web/dawgs_uprising_v22.5.html godot/tests/golden/setup.json
+'use strict';
+const fs = require('fs'), vm = require('vm');
+const [html, out] = process.argv.slice(2);
+if (!out) { console.error('usage: node tools/web_setup.js <web.html> <out.json>'); process.exit(2); }
+const page = fs.readFileSync(html, 'utf8');
+let src = [...page.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes('SIMULATION CORE'));
+const hook = (at, code) => { if (!src.includes(at)) throw new Error('hook point not found: ' + at); src = src.replace(at, code + at); };
+// count the battle generator's draws
+const RND = 'const rnd=mulberry32((opts.rngSeed||seed)^0x9e3779b9);';
+if (!src.includes(RND)) throw new Error('rnd definition not found');
+src = src.replace(RND, 'const __r=mulberry32((opts.rngSeed||seed)^0x9e3779b9);let __rc=0;const rnd=()=>{__rc++;return __r();};globalThis.__cp={};');
+// checkpoint 1: armies and bases set up (before build plots)
+hook('  // ---- build plots: each base grows', 'globalThis.__cp.zones={rc:__rc,factions:structuredClone(F),zones:structuredClone(G.zones),home:G.home,homes:G.homes.slice()};\n');
+const ctx = { module: { exports: {} }, console, structuredClone };
+vm.createContext(ctx);
+vm.runInContext(src, ctx, { filename: 'web-sim.js' });
+const SIM = ctx.module.exports;
+const version = (page.match(/GAME_VERSION=\{number:'([^']+)'/) || [])[1] || '?';
+const dv = new DataView(new ArrayBuffer(8));
+const hex = x => { dv.setFloat64(0, x); return dv.getBigUint64(0).toString(16).padStart(16, '0'); };
+const exact = v => typeof v === 'number' ? (Object.is(v, -0) || !Number.isInteger(v) ? '#' + hex(v) : v)
+  : Array.isArray(v) ? v.map(exact) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, exact(x)])) : v;
+
+const RUNS = [
+  ['dawgs_s1', { map: 'dawgs', seed: 1 }],
+  ['tutorial', { map: 'tutorial', seed: 3 }],
+  ['twinreach_teams', { map: 'twinreach', seed: 5, mode: 'teams', ai: [{ p: 0, team: 1 }, { p: 1, team: 2 }, { p: 2, team: 2, diff: 'easy' }, { p: 3, team: 3, diff: 'normal' }] }],
+  ['crown_8', { map: 'crown', seed: 11, ai: Array.from({ length: 7 }, (_, i) => ({ p: i, team: i + 2 })) }],
+  ['chaos_s8', { map: 'chaos', seed: 8 }],
+];
+const res = {};
+for (const [name, opts] of RUNS) {
+  SIM.createGame(opts);
+  const cp = ctx.__cp;
+  res[name] = { opts, checkpoints: exact(cp) };
+  console.log(`${name}: ` + Object.entries(cp).map(([k, v]) => `${k} after ${v.rc} draws`).join(', '));
+}
+fs.writeFileSync(out, JSON.stringify({ web: version, runs: res }) + '\n');

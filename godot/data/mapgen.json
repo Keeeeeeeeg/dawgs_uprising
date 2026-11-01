@@ -292,5 +292,8 @@
  "slots": {
   "far": 1000000000.0,
   "teamWorst": -1000000000.0
- }
+ },
+ "defaultSeed": 20261017,
+ "defaultMap": "dawgs",
+ "rngXor": 2654435769
 }

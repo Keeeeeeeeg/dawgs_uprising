@@ -497,7 +497,7 @@ static func _once(seen: Array, o: Dictionary) -> bool:
 
 # ---------- start slots (web createGame: "assign HQ start slots") ----------
 
-## Picks each army's HQ start and returns {slotOf, zonesFinal, NF, teamOf, mode}.
+## Picks each army's HQ start and returns {slotOf, zonesFinal, NF, teamOf, mode, humans, ai}.
 ## opts: like the web createGame options (humans, ai, mode). rnd: the battle's Rng (Chaos Isles
 ## shuffles the starts with it). Unused HQ slots become neutral Fortresses.
 static func battle_zones(m: Dictionary, opts: Dictionary, rnd, gen: Dictionary) -> Dictionary:
@@ -596,4 +596,4 @@ static func battle_zones(m: Dictionary, opts: Dictionary, rnd, gen: Dictionary) 
 	for k in m.slots.size():
 		if not used.has(k):
 			zones_final[int(m.slots[k])][1] = "fortress"
-	return {"slotOf": slot_of, "zonesFinal": zones_final, "NF": NF, "teamOf": team_of, "mode": mode}
+	return {"slotOf": slot_of, "zonesFinal": zones_final, "NF": NF, "teamOf": team_of, "mode": mode, "humans": humans, "ai": ai}

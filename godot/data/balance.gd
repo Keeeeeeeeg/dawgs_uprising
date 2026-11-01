@@ -8,6 +8,7 @@ extends Node
 const PATH := "res://data/balance.json"
 
 var data: Dictionary = {}
+var _game: Dictionary = {}
 
 
 func _init() -> void:
@@ -46,3 +47,13 @@ static func lookup(from: Dictionary, path: String, fallback: Variant = null) -> 
 			push_error("Balance: missing '%s'" % path)
 			return fallback
 	return cur
+
+
+## Everything a battle needs, as Sim.new() takes it: balance, maps, mapgen and factions.
+## Loaded once and shared (the SIM copies what it changes).
+func game_data() -> Dictionary:
+	if _game.is_empty():
+		const Maps := preload("res://sim/maps.gd")
+		_game = {"balance": data, "maps": Maps.load_maps("res://data/maps.json"),
+			"mapgen": load_file("res://data/mapgen.json"), "factions": load_file("res://data/factions.json")}
+	return _game

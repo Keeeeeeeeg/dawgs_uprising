@@ -1836,7 +1836,8 @@
   "dogpile": 0.85,
   "garrisonWeight": 0.5,
   "jitterMin": 0.7,
-  "jitterSpread": 0.6
+  "jitterSpread": 0.6,
+  "passiveWave": 1000000000.0
  },
  "campaign": {
   "defenderPillboxes": 2,

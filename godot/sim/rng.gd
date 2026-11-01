@@ -10,6 +10,7 @@ const M32 := 0xFFFFFFFF
 const TWO32 := 4294967296.0
 
 var _a: int
+var draws := 0   # how many numbers have been drawn (tests compare this with the web game)
 
 
 ## `seed` may be negative or wider than 32 bits; only its low 32 bits are used, like JS `a|=0`.
@@ -19,6 +20,7 @@ func _init(seed: int) -> void:
 
 ## Next value as an unsigned 32-bit int (0 .. 2^32-1).
 func next_u32() -> int:
+	draws += 1
 	_a = (_a + 0x6D2B79F5) & M32
 	var t := imul(_a ^ (_a >> 15), 1 | _a)
 	t = ((t + imul(t ^ (t >> 7), 61 | t)) & M32) ^ t

@@ -11,7 +11,7 @@ var sim: SimCore
 
 
 func _ready() -> void:
-	sim = SimCore.new(Balance.data, {"seed": 1})
+	sim = SimCore.new(Balance.game_data(), {"map": "dawgs", "seed": 1})
 	sim.event.connect(_on_sim_event)
 
 
