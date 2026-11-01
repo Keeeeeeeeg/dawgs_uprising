@@ -1,5 +1,5 @@
 {
- "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). 'engine' holds the SIM's fixed-step timing, added for the Godot port.",
+ "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). Added for the port: 'engine' (fixed-step timing, pathfinding, spatial hash) and 'motion' (how units turn, follow paths, get unstuck and push apart), plus a few keys in combat, targeting, guard and retaliate, all numbers the web SIM writes inline.",
  "engine": {
   "step": 0.03333333333333333,
   "maxFrame": 0.25,
@@ -10,6 +10,37 @@
   "losStep": 0.8,
   "snapRings": 40,
   "hashBucket": 10
+ },
+ "motion": {
+  "spawnTurn": 6.28,
+  "spawnAcquire": 0.35,
+  "angWrap": 6.2832,
+  "turnVeh": 5,
+  "turnInf": 10,
+  "aimTurnVeh": 4,
+  "aimTurnInf": 9,
+  "pathBudget": 10,
+  "repathMove": 4,
+  "chaseWpArrive": 1.2,
+  "repathEvery": 1,
+  "repathJitter": 0.6,
+  "pathArrive": 0.5,
+  "pathWpArrive": 1.4,
+  "losEvery": 0.5,
+  "losJitter": 0.3,
+  "stuckTime": 1.5,
+  "stuckDist": 0.6,
+  "homeDrift": 2.5,
+  "homeArrive": 1.5,
+  "backoffArrive": 0.5,
+  "worldEdge": 4,
+  "sepReach": 1.8,
+  "sepMaxPush": 0.5,
+  "sepPushK": 0.5,
+  "sepRate": 12,
+  "sepVehVsInf": 0.3,
+  "sepOverlap": 0.0001,
+  "sepMinDist": 0.01
  },
  "units": {
   "carrier": {
@@ -1395,7 +1426,8 @@
   "garrisonPad": 14,
   "alertEvery": 2,
   "alertRefresh": 0.5,
-  "boatReach": 25
+  "boatReach": 25,
+  "minEffect": 0.1
  },
  "guard": {
   "every": 1,
@@ -1403,7 +1435,13 @@
   "lead": 1.5,
   "radius": 45,
   "leash": 60,
-  "slack": 5
+  "slack": 5,
+  "jitterMin": 0.85,
+  "jitterSpread": 0.3,
+  "threatMemory": 3,
+  "ring": 8,
+  "stillSpeed": 0.3,
+  "onWayK": 0.5
  },
  "carrier": {
   "speed": 3,
@@ -1625,7 +1663,14 @@
   "frontCos": 0.5,
   "rearCos": -0.3,
   "sideMult": 1.1,
-  "raidAlarm": 15
+  "raidAlarm": 15,
+  "scatterTurn": 6.283,
+  "minFlight": 0.05,
+  "shotYAir": -0.4,
+  "shotYVeh": 0.9,
+  "shotYInf": 0.66,
+  "hitYVeh": 0.9,
+  "hitYInf": 0.6
  },
  "targeting": {
   "antiVehOnVeh": 0.35,
@@ -1633,7 +1678,8 @@
   "gunOnVeh": 1.8,
   "stickiness": 0.7,
   "uselessBelow": 0.1,
-  "uselessPenalty": 8
+  "uselessPenalty": 8,
+  "structPenalty": 6
  },
  "unitRadius": {
   "carrier": 9,

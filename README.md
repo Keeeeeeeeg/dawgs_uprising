@@ -72,7 +72,8 @@ A check that crashes counts as a failure. The checks compare the SIM with record
 - [x] Unity 6.3 LTS project (URP) with the SIM as a local package
 - [x] SIM phase 1: exact maths, maps, Chaos Isles, terrain, pathfinding, spatial hash, unit/base tables (identical to web v22.5)
 - [x] SIM phase 2a: battle setup (armies, bases, start slots) and build plots (runways, streets, quays, plots, levelling)
-- [ ] SIM: core loop, units, orders, movement, combat
+- [x] SIM phase 2b: units, orders (move, attack-move, attack, stop, formations, stances, guard), movement, combat, projectiles (ground units, helicopters and boats; checked tick by tick against 5 web scenarios)
+- [ ] SIM: the rest of the core loop (starting garrisons and squads, rovers and construction, recruiting, healing)
 - [ ] SIM: zones, base types, capture, garrisons
 - [ ] SIM: walls, gates, team grids, manning
 - [ ] SIM: air (airbase cycle, carriers), naval

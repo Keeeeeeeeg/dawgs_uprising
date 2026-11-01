@@ -41,6 +41,7 @@ namespace DawgsUprising.Sim.Tests
             Run("spatial", Checks.Spatial);
             Run("tables", Checks.Tables);
             Run("setup", Checks.Setup);
+            Run("units", UnitChecks.Units);
             Console.WriteLine(_failed == 0 ? $"TESTS PASSED {_passed}/{_passed}" : $"TESTS FAILED {_failed} of {_passed + _failed}");
             Console.WriteLine($"({sw.Elapsed.TotalSeconds:F1} s)");
             return _failed == 0 ? 0 : 1;

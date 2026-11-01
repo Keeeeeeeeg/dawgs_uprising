@@ -57,13 +57,34 @@ namespace DawgsUprising.Sim
         public ProdSpec Prod;
     }
 
+    /// <summary>A weapon (balance.json weapons.*): how hard it hits each armor class, and its projectile.</summary>
+    public sealed class Weapon
+    {
+        public double Speed;
+        public bool Homing, Airburst;
+        readonly Dictionary<string, double> _vs = new Dictionary<string, double>();
+
+        public Weapon(JObj o)
+        {
+            foreach (var k in o.Keys)
+                if (k == "speed") Speed = o.Num(k);
+                else if (k == "homing") Homing = o.Bool(k);
+                else if (k == "airburst") Airburst = o.Bool(k);
+                else _vs[k] = o.Num(k);
+        }
+
+        /// <summary>Damage multiplier against an armor class (web VS[weapon][armor]).</summary>
+        public double Vs(string armor) => _vs.TryGetValue(armor, out double v) ? v : throw new KeyNotFoundException($"no weapon multiplier for armor '{armor}'");
+    }
+
     /// <summary>
     /// The SIM's derived tables, built from balance.json like the web SIM does at load time: unit types (UTYPES),
-    /// base types (ZTYPES), facilities and plot counts per base type. No numbers here: radii, sight and vision
-    /// padding all come from balance.json.
+    /// base types (ZTYPES), facilities, weapons (VS) and plot counts per base type. No numbers here: radii, sight and
+    /// vision padding all come from balance.json.
     /// </summary>
     public sealed class Tables
     {
+        public readonly Dictionary<string, Weapon> Weapons = new Dictionary<string, Weapon>();
         public readonly Dictionary<string, UnitType> UTypes = new Dictionary<string, UnitType>();
         public readonly Dictionary<string, ZoneType> ZTypes = new Dictionary<string, ZoneType>();
         public readonly Dictionary<string, Facility> Facilities = new Dictionary<string, Facility>();
@@ -71,6 +92,8 @@ namespace DawgsUprising.Sim
 
         public Tables(JObj balance)
         {
+            var weapons = balance.Obj("weapons");
+            foreach (var k in weapons.Keys) Weapons[k] = new Weapon(weapons.Obj(k));
             var RAD = balance.Obj("unitRadius");
             var SG = balance.Obj("sight");
             var VIS = balance.Obj("vision");

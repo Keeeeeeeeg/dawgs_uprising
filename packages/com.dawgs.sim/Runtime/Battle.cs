@@ -102,7 +102,7 @@ namespace DawgsUprising.Sim
     /// - No gameplay numbers in code: read them from the data files.
     /// - The renderer reads state; it changes the SIM only through commands.
     /// </summary>
-    public sealed class Battle
+    public sealed partial class Battle
     {
         public readonly GameData Data;
         public readonly JObj Balance;
@@ -179,6 +179,7 @@ namespace DawgsUprising.Sim
             Terrain = Terrain.Build(Map, Seed, Balance, gen);
             Pathing = new Pathing(Terrain, Balance.Obj("engine"));
             Tables = new Tables(Balance);
+            SetupUnits();
             SetupFactions(ST);
             SetupZones(ST);
             checkpoint?.Invoke("zones", this);
@@ -335,14 +336,23 @@ namespace DawgsUprising.Sim
             }
         }
 
+        /// <summary>Run n fixed ticks directly (web stepTicks), for tests and lockstep.</summary>
+        public void StepTicks(int n)
+        {
+            for (int i = 0; i < n && !Over; i++) Tick(_step);
+        }
+
         void Tick(double dt)
         {
             Time += dt;
             Ticks++;
-            // Port order, from the web SIM's tick(): rebuildHash, airbaseUpkeep, updateUnit (each unit), separate,
-            // updateProjectiles, recruitTick, autoMan, then every 0.25 s updateZones/produce/updateFacilities,
-            // economy, missiles, heal every 0.5 s, carrierTick, faction AI, visibility every 0.2 s, and dead-unit
-            // cleanup every 1 s.
+            if (Terrain == null) return;   // balance-only battles just keep time
+            // Web tick() order: rebuildHash, airbaseUpkeep, updateUnit (each unit), separate, updateProjectiles, then
+            // recruitTick, autoMan, every 0.25 s updateZones/produce/updateFacilities, economy, missiles, heal every 0.5 s,
+            // carrierTick, faction AI and visibility every 0.2 s. Ported so far: the unit systems.
+            UnitSystems(dt);
+            _cleanT += dt;
+            if (_cleanT >= 1) { Units = Units.FindAll(u => u.Alive); _cleanT = 0; }   // drop the dead every second
         }
 
         /// <summary>Fingerprint of the game state, to spot machines drifting apart in multiplayer.
