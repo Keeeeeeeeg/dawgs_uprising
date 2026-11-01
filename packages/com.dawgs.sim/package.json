@@ -1,0 +1,7 @@
+{
+  "name": "com.dawgs.sim",
+  "version": "0.1.0",
+  "displayName": "Dawgs Uprising SIM",
+  "description": "The game simulation (web SIM port): plain C#, no UnityEngine, deterministic, tested against recordings of the web game outside Unity (tests/SimTests).",
+  "unity": "6000.3"
+}

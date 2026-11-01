@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Runs the SIM's checks outside Unity: compiles the same source files Unity uses
+       (packages/com.dawgs.sim/Runtime) against plain .NET, with no outside packages.
+       Language level matches Unity 6 (C# 9).   Run:  dotnet run -c Release   (from this folder) -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>DawgsUprising.Sim.Tests</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../packages/com.dawgs.sim/Runtime/**/*.cs" Link="Sim/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

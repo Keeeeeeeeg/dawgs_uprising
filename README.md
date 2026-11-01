@@ -9,6 +9,8 @@ This repo is the source of truth for the whole team.
 
 ```
 unity/    Unity project (open with Unity Hub, Unity 6.3 LTS)
+packages/com.dawgs.sim/  the game logic (SIM): plain C#, no UnityEngine; Unity loads it as a local package
+tests/SimTests/          runs the SIM's checks outside Unity:  cd tests/SimTests && dotnet run -c Release
 godot/    first port in Godot (reference until the Unity port matches it)
 blender/  Blender source files (.blend, via Git LFS)
 web/      The original single-file HTML game, kept for reference
@@ -18,8 +20,8 @@ tools/    scripts that record the web game for the tests
 ## Setup (Unity)
 
 1. Install **Unity Hub**: https://unity.com/download
-2. In Unity Hub: **Installs → Install Editor → Unity 6.3 LTS** (the newest 6.3 patch; everyone must use the
-   same patch, see `unity/ProjectSettings/ProjectVersion.txt`). Keep the default modules.
+2. In Unity Hub: **Installs → Install Editor → Unity 6.3 LTS, 6000.3.27f2** (everyone must use this exact version;
+   not 6.6, which Hub marks "Recommended"). Keep the default modules.
 3. Sign in and pick the free **Unity Personal** licence when Hub asks.
 4. Install **Git LFS** once per machine (https://git-lfs.com), then `git lfs install`.
 5. Clone, then in Unity Hub: **Add → Add project from disk** and pick the `unity` folder.
