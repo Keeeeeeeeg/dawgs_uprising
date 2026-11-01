@@ -37,3 +37,31 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# Unity (project lives in unity/)
+unity/[Ll]ibrary/
+unity/[Tt]emp/
+unity/[Oo]bj/
+unity/[Bb]uild/
+unity/[Bb]uilds/
+unity/[Ll]ogs/
+unity/[Uu]ser[Ss]ettings/
+unity/[Mm]emoryCaptures/
+unity/[Rr]ecordings/
+unity/*.csproj
+unity/*.sln
+unity/*.slnx
+unity/*.suo
+unity/*.user
+unity/*.pidb
+unity/*.booproj
+unity/*.unityproj
+unity/.vs/
+unity/.vsconfig
+unity/crashlytics-buildid.txt
+unity/sysinfo.txt
+*.apk
+*.aab
+# .NET test project (tests/SimTests)
+tests/**/bin/
+tests/**/obj/

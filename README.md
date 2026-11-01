@@ -1,41 +1,40 @@
 # Dawgs Uprising
 
-RTS, being ported from the single-file HTML game (v22.5) to **Godot 4.7.2**.
+RTS, being ported from the single-file HTML game (v22.5) to **Unity 6.3 LTS** (Unity Personal, free).
 This repo is the source of truth for the whole team.
 
+> **Engine switch (2026-10-31):** the port is moving from Godot to Unity for faster game logic (C#) and a
+> higher graphics ceiling. `godot/` holds the first port (phases 1 and 2a, all tested against the web game)
+> and stays as a reference until the Unity version matches it; then it is removed.
+
 ```
-godot/    Godot project (open godot/project.godot)
+unity/    Unity project (open with Unity Hub, Unity 6.3 LTS)
+godot/    first port in Godot (reference until the Unity port matches it)
 blender/  Blender source files (.blend, via Git LFS)
 web/      The original single-file HTML game, kept for reference
+tools/    scripts that record the web game for the tests
 ```
 
-## Setup
+## Setup (Unity)
 
-1. Install **Godot 4.7.2** (standard build, not .NET): https://godotengine.org/download
-2. Install **Git LFS** once per machine: https://git-lfs.com, then run
-   ```
-   git lfs install
-   ```
-3. Clone:
-   ```
-   git clone https://github.com/Keeeeeeeeg/dawgs_uprising.git
-   cd dawgs_uprising
-   git lfs pull
-   ```
-4. Open Godot, click **Import**, and pick `godot/project.godot`.
-5. Press **F5** to run. The first open takes a moment while Godot builds its `.godot/` cache.
+1. Install **Unity Hub**: https://unity.com/download
+2. In Unity Hub: **Installs → Install Editor → Unity 6.3 LTS** (the newest 6.3 patch; everyone must use the
+   same patch, see `unity/ProjectSettings/ProjectVersion.txt`). Keep the default modules.
+3. Sign in and pick the free **Unity Personal** licence when Hub asks.
+4. Install **Git LFS** once per machine (https://git-lfs.com), then `git lfs install`.
+5. Clone, then in Unity Hub: **Add → Add project from disk** and pick the `unity` folder.
 
 ## Team rules
 
 - **Pull before you start.** `git pull` every time you sit down, before touching anything.
 - **Push when you're done.** Small commits with clear messages, e.g. `sim: port orderMove pathing`.
-- **One person per scene file.** `.tscn` files merge badly. Claim a scene in the team chat before editing it, and say when you're finished.
-- **Never commit `.godot/`.** It's in `.gitignore`. If it ever shows up in `git status`, stop and ask.
-- **No numbers in engine code.** Every gameplay number goes in `godot/data/balance.json` (the old `BALANCE` object).
-- **The SIM never touches rendering.** Nothing under `godot/sim/` may use nodes, scenes, input or the renderer.
+- **One person per scene or prefab.** Scene (`.unity`, `.tscn`) and prefab files merge badly. Claim one in the team chat before editing it, and say when you're finished.
+- **Never commit Unity's `Library/`, `Temp/`, `Logs/` or `UserSettings/`, or Godot's `.godot/`.** They're in `.gitignore`. If one shows up in `git status`, stop and ask. Do commit every `.meta` file.
+- **No numbers in engine code.** Every gameplay number goes in the data files (`balance.json`, the old `BALANCE` object, plus `maps.json`, `mapgen.json`, `factions.json`).
+- **The SIM never touches rendering.** The game logic is plain C# with no `UnityEngine` (in Godot: no nodes). It runs and is tested outside the engine.
 - Big binary files (`.blend`, `.glb`, images, audio, fonts) go through Git LFS automatically. Check `git lfs ls-files` if unsure.
 
-## Project layout (godot/)
+## Project layout (godot/, reference until the Unity port matches it)
 
 | Folder | Web version equivalent | Rule |
 |---|---|---|

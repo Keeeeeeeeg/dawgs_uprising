@@ -39,3 +39,29 @@
 *.otf    filter=lfs diff=lfs merge=lfs -text
 *.woff   filter=lfs diff=lfs merge=lfs -text
 *.woff2  filter=lfs diff=lfs merge=lfs -text
+
+# C# and Unity text assets: LF everywhere
+*.cs        text eol=lf
+*.csproj    text eol=lf
+*.asmdef    text eol=lf
+*.meta      text eol=lf
+*.json      text eol=lf
+# Unity YAML (scenes, prefabs, assets): merge with Unity's Smart Merge (UnityYAMLMerge) if set up
+*.unity     text eol=lf merge=unityyamlmerge
+*.prefab    text eol=lf merge=unityyamlmerge
+*.asset     text eol=lf merge=unityyamlmerge
+*.mat       text eol=lf merge=unityyamlmerge
+*.anim      text eol=lf merge=unityyamlmerge
+*.controller text eol=lf merge=unityyamlmerge
+*.physicMaterial text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.shadergraph text eol=lf
+*.shadersubgraph text eol=lf
+*.vfx       text eol=lf
+# Git LFS: more Unity binaries
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
+*.tif    filter=lfs diff=lfs merge=lfs -text
+*.tiff   filter=lfs diff=lfs merge=lfs -text
+*.aif    filter=lfs diff=lfs merge=lfs -text
+*.aiff   filter=lfs diff=lfs merge=lfs -text
+*.cubemap filter=lfs diff=lfs merge=lfs -text
