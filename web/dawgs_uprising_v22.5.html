@@ -354,6 +354,7 @@ body.inmenu #modal{background:
 .plBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .go.sm{font-size:11px;padding:7px 14px}
 .volSlider,.uiSlider{width:100%;accent-color:var(--militia)}
+.midrow{margin-top:14px}
 details{margin-top:16px}details summary{cursor:pointer;font-family:var(--f-display);letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--dim)}
 .setupGrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px}
 .setupGrid .col{display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -630,6 +631,10 @@ body.inmenu #netTag{display:none}
       <input type="range" id="uiScale" class="uiSlider" min="90" max="150" step="5" value="115">
     </div>
     <label class="tog fogtog"><input type="checkbox" id="hpAlways" checked> Always show unit health bars <small>(otherwise only selected or damaged units)</small></label>
+    <div class="volrow midrow">
+      <span class="setrow"><span>Middle mouse drag <small>hold Shift while dragging for the other one</small></span></span>
+      <div class="seg" id="midMode" role="group" aria-label="Middle mouse drag"><button data-mid="orbit" aria-pressed="true">Orbit · Shift pans</button><button data-mid="pan" aria-pressed="false">Pan · Shift orbits</button></div>
+    </div>
     <h2 class="plHead">Music rotation</h2>
     <p class="plNote">Ticked tracks play in turn. Tracks you add are kept in this browser only.</p>
     <ul class="playlist" id="playlist"></ul>
@@ -752,7 +757,7 @@ body.inmenu #netTag{display:none}
       <kbd>Man walls</kbd><span>With infantry or artillery selected: Orders tab, or right-click your Fortress's walls. Infantry hold the wall walks, artillery the gun pits; they take less damage and are harder to hit. Any order brings them down</span>
       <kbd>Click your base</kbd><span>Lists its buildings (each base holds a limited number): upgrade or demolish them from the command card. Double-click or G zooms in</span>
       <kbd>Click your zone, right click</kbd><span>Set a rally point for the troops that zone builds</span>
-      <kbd>WASD / arrows / edge</kbd><span>Pan camera. Wheel to zoom, middle-drag to pan, click the minimap to jump</span>
+      <kbd>WASD / arrows / edge</kbd><span>Pan camera. Wheel to zoom, middle-drag to orbit and Shift+middle-drag to pan (swap them in Settings), click the minimap to jump</span>
       <kbd>Z X C V B N J K L U Y R O · Shift+T</kbd><span>Train units at the building whose card is open (Barracks: Z X C, Motor Pool: V B N J ⇧T R, Foundry: K L, Helipad: U ⇧U, Dockyard: Y O). E raises a Construction Rover at the deploy point. A base's Recruit tab only raises rovers and lists its buildings under Train at</span>
       <kbd>Q or Missile button</kbd><span>Aim a ballistic missile from your HQ (one built every 2 minutes per HQ, up to 3). Auto fires them for you</span>
       <kbd>Rally all</kbd><span>Click the ground: every zone, including ones you capture later, sends its new troops there</span>
@@ -890,7 +895,7 @@ const BALANCE={
     at:     {name:'Rocketeer',     hot:'C',cost:45, mp:1,hp:40,  speed:5.0, range:21,minR:0, dmg:55, rof:3.6, acc:.78,splash:2,  weapon:'rocket',    armor:'inf', build:14},
     rover:  {name:'Construction Rover',hot:'E',cost:120,mp:1,hp:260,speed:7.5, range:0, minR:0, dmg:0,  rof:1,   acc:0,  splash:0,  weapon:'bullet',    armor:'veh', build:20, builder:true},
     tech:   {name:'Technical',     hot:'V',cost:80, mp:2,hp:190, speed:10.5,range:18,minR:0, dmg:3.6,rof:.17, acc:.50,splash:0,  weapon:'bullet',    armor:'veh', build:20},
-    ltank:  {name:'Light Tank',    hot:'B',cost:110,mp:2,hp:300, speed:10,  range:19,minR:0, dmg:9,  rof:.5,  acc:.75,splash:0,  weapon:'autocannon',armor:'veh', build:24, front:.9, rear:1.35},
+    ltank:  {name:'Light Tank',    hot:'B',cost:110,mp:2,hp:300, speed:10,  range:19,minR:0, dmg:3.2,rof:.16, acc:.62,splash:0,  weapon:'hmg',       armor:'veh', build:24, front:.9, rear:1.35},
     mtank:  {name:'Medium Tank',   hot:'N',cost:200,mp:3,hp:650, speed:6.4, range:23,minR:0, dmg:60, rof:2.6, acc:.85,splash:3,  weapon:'shell',     armor:'veh', build:34, front:.8, rear:1.4},
     htank:  {name:'Heavy Tank',    hot:'J',cost:330,mp:4,hp:1300,speed:4.2, range:25,minR:0, dmg:120,rof:3.8, acc:.85,splash:2,  weapon:'apshell',     armor:'hvy', build:50, front:.7, rear:1.5},
     spg:    {name:'SPG',           hot:'K',cost:150,mp:2,hp:230, speed:7.5, range:31,minR:0, dmg:38, rof:3.2, acc:.80,splash:2.5,weapon:'shell',     armor:'veh', build:30, deploy:1.0, front:.9, rear:1.3},
@@ -921,6 +926,7 @@ const BALANCE={
     //           inf   veh    hvy   air(heli) plane hair  boat  struct  ship(airship)  speed
     bullet:    {inf:1,  veh:.14, hvy:.05,air:.3, plane:.18,hair:.08,boat:.2, struct:.1,ship:.02, speed:75},
     autocannon:{inf:.9, veh:.45, hvy:.15,air:.3, plane:.2, hair:.1, boat:.4, struct:.35,ship:.12,speed:65},
+    hmg:       {inf:1,  veh:.34, hvy:.09,air:.4, plane:.22,hair:.1, boat:.35,struct:.2, ship:.05, speed:75},   // heavy machine guns (light tank's twin turret guns)
     rocket:    {inf:.45,veh:1.6, hvy:2.4,air:1.3,plane:.45,hair:.4, boat:1.4,struct:1.4,ship:.55,speed:30},
     shell:     {inf:.8, veh:1.25,hvy:.9, air:0,  plane:0,  hair:0,  boat:1.0,struct:1.2,ship:0,speed:50},
     apshell:   {inf:.4, veh:1.35,hvy:1.0,air:0,  plane:0,  hair:0,  boat:1.1,struct:1.0,ship:0,speed:60},   // heavy tank: armor-piercing, poor vs infantry
@@ -5318,9 +5324,16 @@ function walledGeo(part){if(wGeos[part])return wGeos[part];const d=WALLED[part],
   return wGeos[part]=out;}
 function wput(par,part,teamMat,lampMat){const gs=walledGeo(part);
   for(const [k,m] of [['body',WMAT.body],['lamp',lampMat||WMAT.lamp],['team',teamMat]]){if(!gs[k])continue;const o=new THREE.Mesh(gs[k],m);o.castShadow=k!=='lamp';o.receiveShadow=true;o.userData.dynamic=true;par.add(o);}}
+// doorways where the wall walk passes through a tower or the gatehouse: [a,b,na,nb] at walk height, (na,nb) the way the door faces.
+// Found by scanning the wall-walk loop against the walled models (the walk is blocked at head height inside each tower).
+const WALK_DOORS={"hq":[[-9.29,15,1,0],[-12.09,12,0,-1],[-12.09,-12.2,0,1],[-9.09,-15,1,0],[8.69,-15,-1,0],[12.09,-11.4,0,1],[12.09,-4.2,0,-1],[12.09,-2.4,0,1],[12.09,2.6,0,-1],[12.09,4.4,0,1],[12.09,12.2,0,-1],[9.09,15,-1,0]],"fort":[[5.16,9.62,0.71,-0.71],[2.95,10.45,-1,0],[-3.15,10.45,1,0],[-5.3,9.48,-0.71,-0.71],[-9.62,5.16,0.71,0.71],[-10.45,2.95,0,-1],[-10.45,-3.15,0,1],[-9.48,-5.3,0.71,-0.71],[-5.16,-9.62,-0.71,0.71],[-2.95,-10.45,1,0],[3.15,-10.45,-1,0],[5.3,-9.48,0.71,0.71],[9.62,-5.16,-0.71,-0.71],[10.45,-2.95,0,1],[10.45,3.15,0,-1],[9.48,5.3,-0.71,0.71]]};
+function walkDoors(q,kind){const wy=kind==='hq'?2.91:2.4,dm=new THREE.MeshBasicMaterial({color:0x0b0c0b}),fr=FORT_MAT.DarkTrim,lamp=FORT_MAT.LightWhite;
+  for(const [a,b,na,nb] of WALK_DOORS[kind]){const d=new THREE.Group();d.position.set(a+na*.28,wy,b+nb*.28);d.rotation.y=Math.atan2(na,nb);q.add(d);
+    const o=[add(d,B(1.15,1.75,.06),dm,0,.88,0),add(d,B(.14,1.9,.16),fr,-.64,.95,0),add(d,B(.14,1.9,.16),fr,.64,.95,0),add(d,B(1.42,.16,.18),fr,0,1.9,0),
+      add(d,B(1.1,.06,.04),M.hazard,0,1.9,.1),add(d,B(.3,.1,.1),lamp,0,2.06,.08),add(d,B(1.3,.06,.5),fr,0,.03,.12)];for(const m of o){m.userData.dynamic=true;m.castShadow=false;}}}
 function walledModel(g,z){if(z.wall.light)return lightWalled(g,z);const kind=z.type==='hq'?'hq':'fort',q=new THREE.Group();q.position.set(0,z.y,0);q.rotation.y=-(z.gate||0);q.scale.y=G.WALL_KY;g.add(q);
   const teamMat=new THREE.MeshLambertMaterial({vertexColors:true,color:facColor(z.owner)}),leafLamp=WMAT.lamp.clone();
-  wput(q,kind,teamMat);if(kind==='fort')fortAddons(q,z);
+  wput(q,kind,teamMat);walkDoors(q,kind);if(kind==='fort')fortAddons(q,z);
   const leafL=new THREE.Group(),leafR=new THREE.Group();q.add(leafL,leafR);wput(leafL,kind+'LeafL',teamMat,leafLamp);wput(leafR,kind+'LeafR',teamMat,leafLamp);
   return {q,teamMat,leafLamp,leafL,leafR,kind,travel:WALLED.dims[kind].leafTravel,open:0,was:0,heads:[],broken:false};}
 // upgrades on a walled base: sentries on the wall walk (Garrison II), siege guns on the towers (Garrison III), the hospital ward
@@ -6130,7 +6143,7 @@ function bindGame(){
   selected.clear();groups={};deployZone=HOME;logLines=[];alertT={};
   G.on('spawn',u=>makeUnitMesh(u));
   G.on('shot',(u,p)=>{if(quiet||!p||!(u.f===ME||G.visibleToPlayer(p.sx,p.sz)))return;const w=p.wpn;
-    if(w==='bullet'||w==='autocannon'){if(Math.random()<.7)fx(p.sx,p.sy,p.sz,0xffd890,w==='bullet'?.32:.55,.07,true);}
+    if(w==='bullet'||w==='hmg'||w==='autocannon'){if(Math.random()<.7)fx(p.sx,p.sy,p.sz,0xffd890,w==='bullet'?.32:.55,.07,true);}
     else if(w==='shell'||w==='apshell'||w==='artillery'){fx(p.sx,p.sy,p.sz,0xffc070,1.5,.12,true);fx(p.sx,p.sy,p.sz,0x8e8a80,1.1,1.8,false);}
     else if(w==='rocket'||w==='hrocket'){fx(p.sx,p.sy,p.sz,0xffb060,.8,.1,true);fx(p.sx,p.sy,p.sz,0xa6a29a,.9,1.4,false);}});
   G.on('produced',(u,z)=>{if(z.owner===ME||G.visibleToPlayer(z.x,z.z)){marker(z.x,z.z,facColor(z.owner),z.r*.35);fx(u.x,z.y+1.2,u.z,0xfff4c0,1.2,.35,true);}});
@@ -6352,7 +6365,6 @@ function lineSlots(g,n){
   }
   return out;
 }
-const RPAN_START=6;   // px a right-drag must travel (with no units selected) before it becomes a camera pan
 function rightRelease(r,e){
   if(armed==='place'){stopPlacing();return;}
   if(armed==='guard'){guardAt(e.clientX,e.clientY);return;}
@@ -6420,7 +6432,7 @@ ov.addEventListener('pointerdown',e=>{
   if(eraseMode&&e.button===0){erasing=true;eraseWorld(e.clientX,e.clientY);return;}
   if(drawMode&&e.button===0){const g=groundAt(e.clientX,e.clientY,true);drawStroke={pts:[],step:Math.max(.6,cam.d/140)};if(g)strokeAdd(g.x,g.z);return;}
   if(e.button===0){drag={x0:e.clientX,y0:e.clientY,x1:e.clientX,y1:e.clientY,on:false,shift:e.shiftKey};}
-  else if(e.button===1){panDrag={x:e.clientX,y:e.clientY,rot:!e.shiftKey};camGoal=null;e.preventDefault();}   // middle drag orbits the camera (Shift+middle drag pans)
+  else if(e.button===1){const pan=!!(window.UI_PREFS&&UI_PREFS.midPan);panDrag={x:e.clientX,y:e.clientY,rot:pan?e.shiftKey:!e.shiftKey};camGoal=null;e.preventDefault();}   // middle drag orbits (Shift pans), or the other way round (Settings)
   else if(e.button===2){const g=groundAt(e.clientX,e.clientY,true);rdrag={pts:[{x:e.clientX,y:e.clientY}],gpts:g?[g]:[],len:0,on:false,fight:fightArmed};}
 });
 ov.addEventListener('pointermove',e=>{
@@ -6429,9 +6441,7 @@ ov.addEventListener('pointermove',e=>{
   if(drawStroke){const g=groundAt(e.clientX,e.clientY,true);if(g)strokeAdd(g.x,g.z);return;}
   if(placing)updatePlacing();
   if(drag){drag.x1=e.clientX;drag.y1=e.clientY;if(!drag.city&&Math.hypot(drag.x1-drag.x0,drag.y1-drag.y0)>6)drag.on=true;}
-  if(rdrag&&!rdrag.pan&&!armed&&!placing&&!selUnits().length&&Math.hypot(e.clientX-rdrag.pts[0].x,e.clientY-rdrag.pts[0].y)>RPAN_START){
-    rdrag.pan=true;panDrag={x:e.clientX,y:e.clientY,rot:false};camGoal=null;ov.style.cursor='grabbing';}
-  if(rdrag&&!rdrag.pan){const l=rdrag.pts[rdrag.pts.length-1],dd=Math.hypot(e.clientX-l.x,e.clientY-l.y);
+  if(rdrag){const l=rdrag.pts[rdrag.pts.length-1],dd=Math.hypot(e.clientX-l.x,e.clientY-l.y);
     if(dd>6){const g=groundAt(e.clientX,e.clientY,true);if(g){rdrag.pts.push({x:e.clientX,y:e.clientY});rdrag.gpts.push(g);rdrag.len+=dd;}}
     if(rdrag.len>14&&selected.size>1)rdrag.on=true;}
   if(panDrag){const ddx=e.clientX-panDrag.x,ddy=e.clientY-panDrag.y;
@@ -6444,7 +6454,7 @@ ov.addEventListener('pointerup',e=>{
   if(erasing&&e.button===0){erasing=false;return;}
   if(drawStroke&&e.button===0){strokeEnd();return;}
   if(e.button===1){panDrag=null;return;}
-  if(e.button===2&&rdrag){const r=rdrag;rdrag=null;if(r.pan){panDrag=null;ov.style.cursor='';return;}rightRelease(r,e);return;}
+  if(e.button===2&&rdrag){const r=rdrag;rdrag=null;rightRelease(r,e);return;}
   if(e.button!==0||!drag)return;
   const d=drag;drag=null;
   if(armed==='place'&&!d.on){confirmPlacing(e.shiftKey);return;}
@@ -6944,7 +6954,7 @@ function renderSelBox(c){
     selHead.innerHTML='<b>Command</b><span class="dim">Nothing selected</span>';
     selBody.innerHTML=`<p class="hint">Drag a box around your units, or click one of your bases or buildings.</p>
       <div class="tips"><kbd>Right-click</kbd><span>move / attack · right-drag to spread along a line</span><kbd>F</kbd><span>fight-move</span><kbd>H</kbd><span>halt</span>
-      <kbd>Shift+1–9</kbd><span>save a control group, 1–9 to recall it</span><kbd>Space</kbd><span>jump home</span><kbd>Middle drag</kbd><span>orbit the camera</span><kbd>Right drag</kbd><span>pan the camera (nothing selected)</span><kbd>Tab</kbd><span>scoreboard · send money to teammates</span><kbd>Ctrl+A</kbd><span>all military units</span><kbd>&#96;</kbd><span>draw on the map for your team</span></div>`;}
+      <kbd>Shift+1–9</kbd><span>save a control group, 1–9 to recall it</span><kbd>Space</kbd><span>jump home</span><kbd>Middle drag</kbd><span>${window.UI_PREFS&&UI_PREFS.midPan?'pan the camera (Shift: orbit)':'orbit the camera (Shift: pan)'}</span><kbd>Tab</kbd><span>scoreboard · send money to teammates</span><kbd>Ctrl+A</kbd><span>all military units</span><kbd>&#96;</kbd><span>draw on the map for your team</span></div>`;}
 }
 function airPanelHTML(us,planes){const others=us.length-planes.length;
   return `<div><b style="font-family:var(--f-display)">${planes.length} aircraft</b>${others?` <span style="color:var(--dim)">+ ${others} ground</span>`:''}
@@ -7932,11 +7942,11 @@ function syncScene(dt){
     if(p.t<0)continue;   // still on the pad
     const k=p.wpn==='missile'?missilePos(p).k:Math.min(1,p.t/p.T);const x=p.sx+(p.ex-p.sx)*k,z=p.sz+(p.ez-p.sz)*k;
     if(p.f!==ME&&!G.visibleToPlayer(x,z)&&!G.visibleToPlayer(p.sx,p.sz))continue;
-    let y=p.sy+(p.ey-p.sy)*k;const arc=p.wpn==='missile'?Math.max(45,Math.hypot(p.ex-p.sx,p.ez-p.sz)*.55):p.wpn==='artillery'?Math.hypot(p.ex-p.sx,p.ez-p.sz)*.42:p.wpn==='rocket'?1.2:p.wpn==='bullet'||p.wpn==='autocannon'?0:.6;y+=Math.sin(k*Math.PI)*arc;
+    let y=p.sy+(p.ey-p.sy)*k;const arc=p.wpn==='missile'?Math.max(45,Math.hypot(p.ex-p.sx,p.ez-p.sz)*.55):p.wpn==='artillery'?Math.hypot(p.ex-p.sx,p.ez-p.sz)*.42:p.wpn==='rocket'?1.2:p.wpn==='bullet'||p.wpn==='hmg'||p.wpn==='autocannon'?0:.6;y+=Math.sin(k*Math.PI)*arc;
     if(p.wpn==='artillery'||p.wpn==='missile'){const k2=Math.min(1,k+.04),y2=p.sy+(p.ey-p.sy)*k2+Math.sin(k2*Math.PI)*arc;tmpDir.set((p.ex-p.sx)*.04,y2-y,(p.ez-p.sz)*.04).normalize();}
     if(p.wpn!=='artillery'&&p.wpn!=='missile')tmpDir.set(p.ex-p.sx,p.ey-p.sy,p.ez-p.sz).normalize();
-    const len=p.wpn==='missile'?4:p.wpn==='bullet'?1.8:p.wpn==='autocannon'?1.3:p.wpn==='artillery'?2.2:p.wpn==='shell'||p.wpn==='apshell'?1.2:1.4;
-    const c=hexC(p.wpn==='missile'?0xfff4e0:p.wpn==='bullet'||p.wpn==='autocannon'?0xffd27a:p.wpn==='artillery'?0xff9a40:0xffb860);
+    const len=p.wpn==='missile'?4:p.wpn==='bullet'||p.wpn==='hmg'?1.8:p.wpn==='autocannon'?1.3:p.wpn==='artillery'?2.2:p.wpn==='shell'||p.wpn==='apshell'?1.2:1.4;
+    const c=hexC(p.wpn==='missile'?0xfff4e0:p.wpn==='bullet'||p.wpn==='hmg'||p.wpn==='autocannon'?0xffd27a:p.wpn==='artillery'?0xff9a40:0xffb860);
     const o=n*6;trPos[o]=x;trPos[o+1]=y;trPos[o+2]=z;trPos[o+3]=x-tmpDir.x*len;trPos[o+4]=y-tmpDir.y*len;trPos[o+5]=z-tmpDir.z*len;
     trCol[o]=c.r;trCol[o+1]=c.g;trCol[o+2]=c.b;trCol[o+3]=c.r*.15;trCol[o+4]=c.g*.15;trCol[o+5]=c.b*.15;n++;
     if((p.wpn==='rocket'||p.wpn==='hrocket')&&Math.random()<.3)fx(x,y,z,0x8a8a84,.45,.8,false);
@@ -7992,7 +8002,7 @@ const TUT_STEPS=[
     <p><b>Win</b> by holding every base. <b>Lose</b> if your HQ falls. The enemy will hold back until the last step, so take your time.</p>
     <p class="dim">In Skirmish and Multiplayer, every battle opens with a <b>15-second planning countdown</b>: time stands still, but you can already give orders, queue builds and set rally points.</p>`},
   {title:'Look around',body:`<p>Move the camera with <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>, the arrow keys, or by pushing the mouse to a screen edge.</p>
-    <p>Scroll the <b>mouse wheel</b> to zoom (all the way out shows the whole map). Drag with the <b>middle button</b> to orbit the camera; Shift+middle drag pans and <kbd>Home</kbd> resets the view. Click the <b>minimap</b> (bottom left) to jump anywhere. <kbd>Space</kbd> brings you home.</p>
+    <p>Scroll the <b>mouse wheel</b> to zoom (all the way out shows the whole map). Drag with the <b>middle button</b> to orbit the camera; Shift+middle drag pans (Settings can swap the two) and <kbd>Home</kbd> resets the view. Click the <b>minimap</b> (bottom left) to jump anywhere. <kbd>Space</kbd> brings you home.</p>
     <p>Press <kbd>M</kbd> for the <b>full-screen map</b>: scroll to zoom, drag to pan, click to jump there, right-click to send selected units. <kbd>M</kbd> or <kbd>Esc</kbd> closes it.</p>
     <p>Press <kbd>Tab</kbd> for the <b>scoreboard</b>: every army's zones, units, kills and losses. In a team game you can send money to a teammate from their row.</p>
     <p>The <b>Draw</b> button (or <kbd>&#96;</kbd>) lets you draw on the battlefield, minimap or full-screen map: your teammates see your strokes, and hovering one shows who drew it. The <b>Erase</b> button (or <kbd>Alt</kbd>+<kbd>&#96;</kbd>) rubs out your own strokes where you click or drag; <kbd>Shift</kbd>+<kbd>&#96;</kbd> clears them all.</p>
@@ -8098,10 +8108,18 @@ return {destroy,
 (function(){
 'use strict';
 // Game version shown on the main menu. Bump it with every update.
-const GAME_VERSION={number:'22.3',name:'Hardpoints',date:'2026-10-31'};
+const GAME_VERSION={number:'22.5',name:'Your camera, your way',date:'2026-10-31'};
 // CHANGELOG: every editor (person or AI) adds an entry here for each update, newest first, and bumps GAME_VERSION.
 // Put the name of the person who asked for the change in `by` (shown next to the version). Older entries whose author wasn't recorded say 'Unrecorded'.
 const CHANGELOG=[
+  {v:'22.5',name:'Your camera, your way',date:'2026-10-31',changes:[
+    'New setting (Settings → Interface): Middle mouse drag. Choose "Orbit · Shift pans" (as before) or "Pan · Shift orbits". Holding Shift always gives you the other one. The choice is kept in this browser.',
+    'Right-drag no longer pans the camera when nothing is selected (from 21.8); right-click and right-drag are back to orders and line formations only.',
+  ]},
+  {v:'22.4',by:'Keegan',name:'Doors in the towers',date:'2026-10-31',changes:[
+    'The wall walk now goes through doorways: wherever troops walking round an HQ or Fortress wall pass through a tower or the gatehouse, there is a framed doorway with a hazard-striped lintel and a lamp on each side (12 on the HQ, 16 on the Fortress), instead of troops walking through solid walls.',
+    'Light tank: its twin turret machine guns now fire as heavy machine guns (a new weapon): about as deadly to infantry as the old autocannon, a little weaker against vehicles and much weaker against heavy armour, with machine-gun tracers and muzzle flashes.',
+  ]},
   {v:'22.3',by:'Keegan',name:'Hardpoints',date:'2026-10-31',changes:[
     'The defence buildings join the new style. Pillboxes, Flamethrower and AA Emplacements now sit in sunken plated revetments (rings of armour plate with a hazard lip, ammo boxes and a lamp; the AA gets a spinning search radar) instead of sandbag rings.',
     'The Pillbox is a plated six-sided casemate with a sloped armour cap, a gun shield with twin machine guns, a periscope hatch and an army-colour band. The Flamethrower Emplacement is a plated bunker with olive fuel tanks, armoured fuel lines and a long nozzle.',
@@ -8729,6 +8747,10 @@ const MAPS=SIM.MAPS,POOL=SIM.AI_POOL;
 let setup={map:'dawgs',mode:'ffa',fog:true,ai:[{p:0,team:2},{p:1,team:2},{p:2,team:2}]};
 // health bars over every unit, or only selected / damaged ones (kept in this browser)
 window.UI_PREFS=window.UI_PREFS||{hpAlways:true};
+// middle mouse drag: orbit the camera (Shift pans), or pan it (Shift orbits). Kept in this browser.
+{try{UI_PREFS.midPan=localStorage.getItem('ventora.midPan')==='1';}catch(e){UI_PREFS.midPan=false;}
+  const bs=[...document.querySelectorAll('#midMode button')],paint=()=>bs.forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.mid==='pan')===!!UI_PREFS.midPan)));
+  bs.forEach(b=>b.addEventListener('click',()=>{UI_PREFS.midPan=b.dataset.mid==='pan';paint();try{localStorage.setItem('ventora.midPan',UI_PREFS.midPan?'1':'0');}catch(e){}}));paint();}
 {const el=document.getElementById('hpAlways');try{const v=localStorage.getItem('ventora.hpAlways');if(v!=null)UI_PREFS.hpAlways=v==='1';}catch(e){}
   el.checked=UI_PREFS.hpAlways;el.addEventListener('change',()=>{UI_PREFS.hpAlways=el.checked;try{localStorage.setItem('ventora.hpAlways',el.checked?'1':'0');}catch(e){}});}
 // interface size: scales the battle HUD (kept in this browser)

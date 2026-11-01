@@ -2,7 +2,7 @@
 // BALANCE literal to JSON and lists the SIM's functions. Merge the result into godot/data/balance.json
 // by hand (keep the "engine" section, which only the Godot port has).
 //   npm i acorn@8 acorn-walk@8
-//   node tools/extract_balance.js web/dawgs_uprising_v22.3.html <out_dir>
+//   node tools/extract_balance.js web/dawgs_uprising_v22.5.html <out_dir>
 // Writes <out_dir>/balance.json and <out_dir>/sim_functions.tsv (name, line, lines, chars).
 const fs = require('fs'), path = require('path');
 const acorn = require('acorn'), walk = require('acorn-walk');

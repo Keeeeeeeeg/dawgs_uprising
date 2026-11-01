@@ -1,9 +1,20 @@
 {
- "number": "0.1.0",
- "name": "Skeleton",
+ "number": "0.1.1",
+ "name": "Baseline v22.5",
  "date": "2026-10-31",
- "webBase": "22.3",
+ "webBase": "22.5",
  "changelog": [
+  {
+   "v": "0.1.1",
+   "by": "Keegan",
+   "name": "Baseline v22.5",
+   "date": "2026-10-31",
+   "changes": [
+    "The port now follows web v22.5, which stays frozen until the port is done (the web reference copy is web/dawgs_uprising_v22.5.html).",
+    "Balance from v22.4: the light tank fires the new heavy machine gun (weapon 'hmg'); its damage, fire rate and accuracy changed to match.",
+    "Web comparison recordings re-made from v22.5. v22.5 itself only changed camera controls, which the renderer port will pick up."
+   ]
+  },
   {
    "v": "0.1.0",
    "by": "Keegan",

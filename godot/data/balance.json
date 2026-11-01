@@ -1,5 +1,5 @@
 {
- "_about": "Every gameplay number. Ported from BALANCE in the web game v22.3 (tools/extract_balance.js). 'engine' holds the SIM's fixed-step timing, added for the Godot port.",
+ "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). 'engine' holds the SIM's fixed-step timing, added for the Godot port.",
  "engine": {
   "step": 0.03333333333333333,
   "maxFrame": 0.25
@@ -121,11 +121,11 @@
    "speed": 10,
    "range": 19,
    "minR": 0,
-   "dmg": 9,
-   "rof": 0.5,
-   "acc": 0.75,
+   "dmg": 3.2,
+   "rof": 0.16,
+   "acc": 0.62,
    "splash": 0,
-   "weapon": "autocannon",
+   "weapon": "hmg",
    "armor": "veh",
    "build": 24,
    "front": 0.9,
@@ -516,6 +516,18 @@
    "struct": 0.35,
    "ship": 0.12,
    "speed": 65
+  },
+  "hmg": {
+   "inf": 1,
+   "veh": 0.34,
+   "hvy": 0.09,
+   "air": 0.4,
+   "plane": 0.22,
+   "hair": 0.1,
+   "boat": 0.35,
+   "struct": 0.2,
+   "ship": 0.05,
+   "speed": 75
   },
   "rocket": {
    "inf": 0.45,

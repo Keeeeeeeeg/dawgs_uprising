@@ -51,7 +51,7 @@ func _check_balance() -> void:
 			if not (units[k] as Dictionary).has(f):
 				missing.append("%s.%s" % [k, f])
 	_ok(missing.is_empty(), "every unit has the core stats %s" % ("" if missing.is_empty() else str(missing)))
-	_ok(Balance.value("units.rifle.hp") == 45.0, "dotted lookup units.rifle.hp = 45 (web v22.3)")
+	_ok(Balance.value("units.rifle.hp") == 45.0, "dotted lookup units.rifle.hp = 45 (web v22.5)")
 
 
 func _run_sim() -> SimCore:

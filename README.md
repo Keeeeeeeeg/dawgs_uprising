@@ -1,6 +1,6 @@
 # Dawgs Uprising
 
-RTS, being ported from the single-file HTML game (v21.5) to **Godot 4.7.2**.
+RTS, being ported from the single-file HTML game (v22.5) to **Godot 4.7.2**.
 This repo is the source of truth for the whole team.
 
 ```
@@ -45,7 +45,7 @@ web/      The original single-file HTML game, kept for reference
 | `data/` | `BALANCE` | `balance.json` plus `version.json` (version and changelog). |
 | `tests/` | Node headless harness | Headless SIM checks (see below). |
 
-Other folders: `web/` holds the web game the port is based on (v22.3), and `tools/extract_balance.js` regenerates balance numbers from it without running it.
+Other folders: `web/` holds the web game the port is based on (v22.5, frozen during the port), and `tools/extract_balance.js` regenerates balance numbers from it without running it.
 
 **Run the tests:** open `tests/run_tests.tscn` and press **F6**, or from the repo root:
 ```
@@ -58,7 +58,7 @@ It prints `TESTS PASSED n/n` when everything is fine. Run it before every push.
 ## Port status
 
 - [x] Repo, LFS and folder setup
-- [ ] Godot project skeleton (sim / render / menus / data)
+- [x] Godot project skeleton (30/30 tests pass in Godot 4.7.2) (sim / render / menus / data)
 - [ ] SIM: core loop, units, orders, pathing grid
 - [ ] SIM: zones, base types, capture, garrisons
 - [ ] SIM: walls, gates, team grids, manning
