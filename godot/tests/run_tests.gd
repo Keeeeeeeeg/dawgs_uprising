@@ -6,6 +6,8 @@ extends Node
 
 const SIM_DIR := "res://sim"
 const SimCore := preload("res://sim/sim.gd")
+const Rng := preload("res://sim/rng.gd")
+const GOLDEN := "res://tests/golden" # recorded from the web SIM by tools/web_trace.js
 const CHUNK := 0.25 # matches the web harness: G.update() is stepped in 0.25 s chunks
 const SECONDS := 30.0
 const UNIT_FIELDS := ["name", "cost", "hp", "speed", "range", "dmg", "rof", "acc", "weapon", "armor"]
@@ -18,6 +20,7 @@ func _ready() -> void:
 	_check_balance()
 	_check_sim_steps()
 	_check_sim_is_pure()
+	_check_rng_matches_web()
 	var total := _passed + _failed
 	if _failed == 0:
 		print("TESTS PASSED %d/%d" % [_passed, total])
@@ -89,3 +92,20 @@ func _check_sim_is_pure() -> void:
 		var banned := ["randf(", "randi(", "Balance.", "get_tree(", "Input."]
 		var found := banned.filter(func(s: String) -> bool: return src.contains(s))
 		_ok(found.is_empty(), "sim/%s uses no globals or unseeded randomness %s" % [file, "" if found.is_empty() else str(found)])
+
+
+## sim/rng.gd must give exactly the numbers the web game's mulberry32 gives (tests/golden/rng.json).
+func _check_rng_matches_web() -> void:
+	var golden := Balance.load_file(GOLDEN.path_join("rng.json"))
+	var seqs: Dictionary = golden.get("mulberry32", {})
+	_ok(not seqs.is_empty(), "golden rng.json loads (web v%s)" % golden.get("web", "?"))
+	for key: String in seqs:
+		var rng := Rng.new(int(key))
+		var bad := -1
+		var want: Array = seqs[key]
+		for i in want.size():
+			# every value is k / 2^32, so compare the integer k (immune to JSON float rounding)
+			if rng.next_u32() != roundi(float(want[i]) * Rng.TWO32):
+				bad = i
+				break
+		_ok(bad == -1, "rng seed %s matches web for %d values%s" % [key, want.size(), "" if bad == -1 else " (differs at %d)" % bad])

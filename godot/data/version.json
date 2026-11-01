@@ -12,7 +12,8 @@
    "changes": [
     "Godot 4.7.2 project with the web version's split: sim/ (pure logic), render/ (battle view and HUD), menus/.",
     "Every BALANCE number from web v22.3 is in data/balance.json.",
-    "The SIM runs a fixed 1/30 s step like the web game; the battle screen shows its clock. No units yet."
+    "The SIM runs a fixed 1/30 s step like the web game; the battle screen shows its clock. No units yet.",
+    "First SIM piece: the seeded random generator (sim/rng.gd), checked number-for-number against the web game. The tests compare the port with recordings of the web SIM in tests/golden/."
    ]
   }
  ]
