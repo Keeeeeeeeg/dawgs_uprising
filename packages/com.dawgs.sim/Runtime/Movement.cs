@@ -59,7 +59,7 @@ namespace DawgsUprising.Sim
                 else if (_pathBudget > 0)
                 {
                     _pathBudget--;
-                    u.Cpath = Pathing.FindPath(u.X, u.Z, x, z, GridOf(u)) ?? new List<double[]> { new[] { x, z } };
+                    u.Cpath = FindPath(u.X, u.Z, x, z, GridOf(u)) ?? new List<double[]> { new[] { x, z } };
                 }
                 else u.Cpath = u.Cpath ?? new List<double[]> { new[] { x, z } };
                 u.Cpi = 0;
@@ -84,7 +84,7 @@ namespace DawgsUprising.Sim
             if (u.NeedRepath && u.Dest != null && _pathBudget > 0)
             {
                 _pathBudget--;
-                u.Path = Pathing.FindPath(u.X, u.Z, u.Dest[0], u.Dest[1], GridOf(u));
+                u.Path = FindPath(u.X, u.Z, u.Dest[0], u.Dest[1], GridOf(u));
                 u.Pi = 0;
                 u.NeedRepath = false;
             }
@@ -149,10 +149,11 @@ namespace DawgsUprising.Sim
             var d = u.Def;
             var CB = _ur.CB;
             var M = _ur.MO;
-            var W = Tables.Weapons[d.Wpn];
-            // (coming out of a base, manning walls, planes and builders arrive later)
+            // (coming out of a base, manning walls and planes arrive later)
             double rng = d.Range;
+            if (d.Builder) { UpdateRover(u, dt); return; }
             if (d.Struct) return;
+            var W = Tables.Weapons[d.Wpn];
             if (u.Guard != null) GuardTick(u, dt);
             u.Cd -= dt;
             u.AcqT -= dt;

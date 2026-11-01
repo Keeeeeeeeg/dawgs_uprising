@@ -478,5 +478,92 @@
   "plotLevelInner": 4.2,
   "far": 1000000000.0,
   "worst": -1000000000.0
+ },
+ "townGrowth": {
+  "_about": "Workshops, houses, sheds, tank stands and container yards outside a walled Town's barrier (web createGame). Ranges are [base, random spread]; a block's height is base + floor(random*2)*step.",
+  "outPad": 1.5,
+  "radK": 0.82,
+  "gateClear": 0.5,
+  "minH": 0.9,
+  "maxRise": 1.4,
+  "probeStep": 1.05,
+  "turn": 6.2832,
+  "plotClear": 4.6,
+  "streetClear": 1,
+  "corrClear": 2,
+  "zoneClear": 8,
+  "propClear": 1.2,
+  "cellPad": 1,
+  "cellR": 0.3,
+  "leanFaces": [
+   3,
+   5,
+   7,
+   9
+  ],
+  "leanD": [
+   1.7,
+   0.5
+  ],
+  "leanJitter": 0.12,
+  "leanIn": 0.4,
+  "leanW": [
+   3.4,
+   1.2
+  ],
+  "leanH": [
+   1.5,
+   0.6
+  ],
+  "tries": 90,
+  "max": 14,
+  "sideChance": 0.6,
+  "sideSplit": 0.5,
+  "sideMin": 0.6,
+  "sideSpread": 1.4,
+  "ringOut": 2.5,
+  "ringPow": 1.5,
+  "ringSpread": 11,
+  "blockChance": 0.45,
+  "leanChance": 0.75,
+  "tanksChance": 0.88,
+  "block": {
+   "w": [
+    2.6,
+    1.4
+   ],
+   "d": [
+    2.2,
+    0.8
+   ],
+   "h": [
+    2,
+    1.3
+   ]
+  },
+  "leanto": {
+   "w": [
+    2.8,
+    1.2
+   ],
+   "d": [
+    2,
+    0.6
+   ],
+   "h": [
+    1.6,
+    0.5
+   ]
+  },
+  "tanks": {
+   "w": 3.4,
+   "d": 2.2,
+   "h": 1.7
+  },
+  "yard": {
+   "w": 3.6,
+   "d": 2.4,
+   "h": 1.4
+  }
  }
 }

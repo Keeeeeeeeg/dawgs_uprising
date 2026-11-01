@@ -19,7 +19,7 @@ namespace DawgsUprising.Sim
         public int Id;
         public string Type;
         public UnitType Def;
-        public int F;
+        public int? F;                      // army, or null for a neutral base's buildings
         public double X, Z, Ang, Hp, MaxHp;
         public bool Alive;
         public string Mode;
@@ -46,6 +46,11 @@ namespace DawgsUprising.Sim
         public double LastHitT;
         public int? LastAttacker;
         public double? AlertT;
+        public bool Healing;
+        public int? ZoneMade, Home, RoverHome, GateOf;   // the base that raised it, its home base, a rover's base, the base whose gate it is
+        public bool GarFlag;               // raised as a garrison
+        public Plot Plot;                  // a building's plot
+        public Zone ZoneOf;                // a building's base (web u.zone)
 
         double ISpatialItem.X => X;
         double ISpatialItem.Z => Z;
@@ -58,7 +63,7 @@ namespace DawgsUprising.Sim
     {
         public double Sx, Sz, Sy, Ex, Ez, Ey, T, Dur, Dmg, Splash;
         public string Wpn;
-        public int F;
+        public int? F;
         public Unit Src, Tgt;
         public bool Homing, Air;
     }
@@ -100,9 +105,10 @@ namespace DawgsUprising.Sim
 
         public static bool IsAir(Unit u) => u.Def.Air;
 
-        /// <summary>The passability grid a unit moves on: water for boats, the land grid for everyone else.
-        /// (Walls give each team its own land grid; they arrive later.)</summary>
-        byte[] GridOf(Unit u) => u.Def.Naval ? Terrain.WaterGrid : Terrain.LandGrid;
+        /// <summary>The passability grid a unit moves on (web gridOf): water for boats; for ground units their team's grid
+        /// once the walls are laid (courtyards open only to the owner's team), else the land grid.</summary>
+        byte[] GridOf(Unit u) => u.Def.Naval ? Terrain.WaterGrid
+            : TeamPass != null && !u.Def.Air && u.F != null ? TeamPass[Factions[u.F.Value].Team] : Terrain.LandGrid;
 
         /// <summary>The grid a group moves on: the first ground unit's (web landGrid).</summary>
         byte[] LandGridOf(List<Unit> us)
@@ -121,11 +127,11 @@ namespace DawgsUprising.Sim
             return Terrain.HeightAt(u.X, u.Z);
         }
 
-        public Unit SpawnUnit(string type, int f, double x, double z)
+        public Unit SpawnUnit(string type, int? f, double x, double z)
         {
             var def = Tables.UTypes[type];
-            if (def.Plane || def.Builder || def.Carrier)
-                throw new NotSupportedException($"{type}: planes, carriers and builders arrive with airbases and construction");
+            if (def.Plane || def.Carrier)
+                throw new NotSupportedException($"{type}: planes and carriers arrive with airbases and carrier battles");
             var p = def.Air ? new[] { x, z } : Pathing.SnapPassable(x, z, def.Naval ? Terrain.WaterGrid : Terrain.LandGrid);
             var M = _ur.MO;
             var u = new Unit
@@ -190,7 +196,7 @@ namespace DawgsUprising.Sim
             cx /= units.Count;
             cz /= units.Count;
             var lg = LandGridOf(units);
-            var shared = Pathing.FindPath(cx, cz, x, z, lg);
+            var shared = FindPath(cx, cz, x, z, lg);
             bool veh = units.Exists(u => u.Def.IsVeh || u.Def.Naval);
             var slots = FormationSlots(units.Count, x, z, veh ? OR.Num("spacingVeh") : OR.Num("spacingInf"), lg);
             // assign slots by sorting both on axis perpendicular to travel
@@ -214,7 +220,7 @@ namespace DawgsUprising.Sim
                 if (u.Def.Naval)
                 {
                     var w = Pathing.SnapPassable(s[0], s[1], Terrain.WaterGrid);
-                    path = Pathing.FindPath(u.X, u.Z, w[0], w[1], Terrain.WaterGrid) ?? new List<double[]> { w };
+                    path = FindPath(u.X, u.Z, w[0], w[1], Terrain.WaterGrid) ?? new List<double[]> { w };
                     StartMove(u, path, w, amove);
                     continue;
                 }
@@ -223,7 +229,7 @@ namespace DawgsUprising.Sim
                 var gr = GridOf(u);
                 if (DMath.Hypot(u.X - cx, u.Z - cz) > OR.Num("sharePath") || shared == null || !Pathing.Los(u.X, u.Z, shared[0][0], shared[0][1], gr)
                     || (shared.Count > 1 && !Pathing.Los(shared[shared.Count - 2][0], shared[shared.Count - 2][1], s[0], s[1], gr)))
-                    path = Pathing.FindPath(u.X, u.Z, s[0], s[1], gr);
+                    path = FindPath(u.X, u.Z, s[0], s[1], gr);
                 else
                 {
                     path = new List<double[]>();
@@ -254,7 +260,7 @@ namespace DawgsUprising.Sim
             sx /= slots.Count;
             sz /= slots.Count;
             var lg = LandGridOf(units);
-            var shared = Pathing.FindPath(cx, cz, sx, sz, lg);
+            var shared = FindPath(cx, cz, sx, sz, lg);
             for (int i = 0; i < us.Count; i++)
             {
                 var u = us[i];
@@ -269,7 +275,7 @@ namespace DawgsUprising.Sim
                 if (u.Def.Naval)
                 {
                     var w = Pathing.SnapPassable(slots[i][0], slots[i][1], Terrain.WaterGrid);
-                    path = Pathing.FindPath(u.X, u.Z, w[0], w[1], Terrain.WaterGrid) ?? new List<double[]> { w };
+                    path = FindPath(u.X, u.Z, w[0], w[1], Terrain.WaterGrid) ?? new List<double[]> { w };
                 }
                 else if (shared != null && DMath.Hypot(u.X - cx, u.Z - cz) < _ur.OR.Num("sharePath"))
                 {
@@ -277,9 +283,9 @@ namespace DawgsUprising.Sim
                     for (int k = 0; k < shared.Count - 1; k++) path.Add(new[] { shared[k][0], shared[k][1] });
                     var last = path.Count > 0 ? path[path.Count - 1] : new[] { u.X, u.Z };
                     if (Pathing.Los(last[0], last[1], s[0], s[1], lg)) path.Add(new[] { s[0], s[1] });
-                    else path = Pathing.FindPath(u.X, u.Z, s[0], s[1], lg) ?? new List<double[]> { new[] { s[0], s[1] } };
+                    else path = FindPath(u.X, u.Z, s[0], s[1], lg) ?? new List<double[]> { new[] { s[0], s[1] } };
                 }
-                else path = Pathing.FindPath(u.X, u.Z, s[0], s[1], lg) ?? new List<double[]> { new[] { s[0], s[1] } };
+                else path = FindPath(u.X, u.Z, s[0], s[1], lg) ?? new List<double[]> { new[] { s[0], s[1] } };
                 StartMove(u, path, new[] { s[0], s[1] }, amove);
             }
         }

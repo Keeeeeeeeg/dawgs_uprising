@@ -5,11 +5,14 @@ namespace DawgsUprising.Sim
 {
     public sealed class Circle { public double X, Z, R; }
 
-    /// <summary>A terrain feature that blocks movement: rocks, ruins, wrecks...</summary>
+    /// <summary>A terrain feature that blocks movement: rocks, ruins, wrecks... and, outside a walled Town, its
+    /// workshops and yards (W x D footprint, Ht tall, Town = the town's zone id).</summary>
     public sealed class Prop
     {
         public string Type;
         public double X, Z, Rot, V, H;
+        public double W, D, Ht;
+        public int? Town;
         public List<Circle> Circles = new List<Circle>();
     }
 

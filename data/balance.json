@@ -1,5 +1,5 @@
 {
- "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). Added for the port: 'engine' (fixed-step timing, pathfinding, spatial hash) and 'motion' (how units turn, follow paths, get unstuck and push apart), plus a few keys in combat, targeting, guard and retaliate, all numbers the web SIM writes inline.",
+ "_about": "Every gameplay number. Ported from BALANCE in the web game v22.5 (tools/extract_balance.js). Added for the port: 'engine' (fixed-step timing, pathfinding, spatial hash) and 'motion' (how units turn, follow paths, get unstuck and push apart), plus a few keys in combat, targeting, guard, retaliate, walls, start, build and heal, and 'garrison', all numbers the web SIM writes inline.",
  "engine": {
   "step": 0.03333333333333333,
   "maxFrame": 0.25,
@@ -9,7 +9,8 @@
   "pathHeuristicWeight": 1.05,
   "losStep": 0.8,
   "snapRings": 40,
-  "hashBucket": 10
+  "hashBucket": 10,
+  "cleanEvery": 1
  },
  "motion": {
   "spawnTurn": 6.28,
@@ -1163,7 +1164,12 @@
      1
     ]
    ]
-  }
+  },
+  "cellReach": 1,
+  "edgePad": 0.6,
+  "towerR": 0.9,
+  "gateOut": 0.4,
+  "gateApproach": 2.6
  },
  "zones": {
   "hq": {
@@ -1519,7 +1525,11 @@
   "aiThinkStagger": 0.7,
   "aiWave": 22,
   "aiWaveStagger": 5,
-  "airbaseHangar": true
+  "airbaseHangar": true,
+  "squadX": 3,
+  "squadZ": 5,
+  "squadGap": 2.2,
+  "squadCols": 3
  },
  "aggro": {
   "start": 12,
@@ -1557,7 +1567,9 @@
   "naval": 0.05,
   "portReach": 26,
   "hospitalCost": 140,
-  "hospitalTime": 20
+  "hospitalTime": 20,
+  "every": 0.5,
+  "repairReach": 10
  },
  "drill": {
   "slow": 1.6,
@@ -1588,6 +1600,14 @@
    "rifle",
    "mg"
   ]
+ },
+ "garrison": {
+  "minCap": 2,
+  "turn": 6.28,
+  "rMin": 0.25,
+  "rSpread": 0.55,
+  "mixStep": 0.6,
+  "mixJitter": 0.3
  },
  "manning": {
   "climb": 0.7,
@@ -1745,7 +1765,13 @@
   "roverAtHQ": 2,
   "aiRovers": 3,
   "stack": 0.6,
-  "reach": 6.5
+  "reach": 6.5,
+  "footProbe": 2.2,
+  "footStep": 1.05,
+  "footTurn": 6.2832,
+  "footMin": 0.8,
+  "waterReach": 9.5,
+  "plotBlock": 2.6
  },
  "orders": {
   "spacingInf": 1.7,

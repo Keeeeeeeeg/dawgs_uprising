@@ -121,7 +121,8 @@ namespace DawgsUprising.Sim
                 bool ok = mn > minH && av < maxAvg && mx - mn < maxSlope;
                 if (!ok) _t.LandGrid[k] = 0;
                 else if (_t.LandGrid[k] == 0 && !NearProp(_t.X0 + (i + 0.5) * _t.Cell, _t.Z0 + (j + 0.5) * _t.Cell)) _t.LandGrid[k] = 1;
-                // walls (later): wall cells stay blocked, and the team grids follow
+                if (_sim.WallCell != null && _sim.WallCell[k] != 0) _t.LandGrid[k] = 0;   // wall cells stay blocked
+                _sim.SyncCell(k);
             }
             _touched.Clear();
             _touchedSet.Clear();
@@ -507,6 +508,89 @@ namespace DawgsUprising.Sim
             return o;
         }
 
+        // ---------- a walled Town outgrows its walls (web createGame, before the walls are laid) ----------
+
+        /// <summary>Workshops lean on the outside of each Town's barrier and houses, sheds, tank stands and container
+        /// yards spread beyond it. They are map props: troops walk round them. Placed from a per-town seed (not the
+        /// battle's random numbers), so every player's game gets the same ones. Numbers: mapgen.json "townGrowth".</summary>
+        public void TownGrowth()
+        {
+            var TG = _sim.Data.Mapgen.Obj("townGrowth");
+            var W = _sim.Balance.Obj("walls").Obj("town");
+            double turn = TG.Num("turn"), radK = TG.Num("radK"), probe = TG.Num("probeStep");
+            foreach (var z in _sim.Zones)
+            {
+                if (z.Type != "town") continue;
+                uint sd = unchecked((uint)(z.Id + 1) * 2654435761u + 977u);   // the web game's per-town generator
+                double Rn() { unchecked { sd = sd * 1664525u + 1013904223u; } return sd / 4294967296.0; }
+                var mine = new List<Prop>();
+                double R0 = W.Num("ap") + W.Num("thick") + TG.Num("outPad"), zy = _t.HeightAt(z.X, z.Z);
+                bool Put(double ang, double rr, double w, double d, double h, string kind)
+                {
+                    double x = z.X + DMath.Cos(ang) * rr, zz = z.Z + DMath.Sin(ang) * rr, rad = DMath.Hypot(w, d) / 2 * radK;
+                    if (AngD(ang, z.Gate) < TG.Num("gateClear") || !_t.Passable(x, zz)) return false;
+                    double hh = _t.HeightAt(x, zz);
+                    if (hh < TG.Num("minH") || Math.Abs(hh - zy) > TG.Num("maxRise")) return false;
+                    for (double b = 0; b < turn; b += probe)
+                        if (!_t.Passable(x + DMath.Cos(b) * rad, zz + DMath.Sin(b) * rad)) return false;
+                    foreach (var p in _allPlots) if (DMath.Hypot(p.X - x, p.Z - zz) < rad + TG.Num("plotClear")) return false;
+                    foreach (var st in Streets) if (StreetDist(st, x, zz) < st.W / 2 + rad + TG.Num("streetClear")) return false;
+                    if (InCorr(x, zz, rad + TG.Num("corrClear"))) return false;
+                    foreach (var o in _sim.Zones) if (o != z && DMath.Hypot(o.X - x, o.Z - zz) < o.R + rad + TG.Num("zoneClear")) return false;
+                    foreach (var q in _t.Props)
+                        foreach (var c in q.Circles) if (DMath.Hypot(c.X - x, c.Z - zz) < c.R + rad + TG.Num("propClear")) return false;
+                    var prop = new Prop { Type = kind, X = x, Z = zz, Rot = ang, V = Rn(), H = hh, W = w, D = d, Ht = h, Town = z.Id };
+                    prop.Circles.Add(new Circle { X = x, Z = zz, R = rad });
+                    double pad = TG.Num("cellPad"), cr = TG.Num("cellR");
+                    int j1 = (int)Math.Floor((zz + rad + pad - _t.Z0) / _t.Cell), i1 = (int)Math.Floor((x + rad + pad - _t.X0) / _t.Cell);
+                    for (int j = (int)Math.Floor((zz - rad - pad - _t.Z0) / _t.Cell); j <= j1; j++)
+                        for (int i = (int)Math.Floor((x - rad - pad - _t.X0) / _t.Cell); i <= i1; i++)
+                        {
+                            if (i < 0 || j < 0 || i >= _t.GW || j >= _t.GH) continue;
+                            if (DMath.Hypot(_t.X0 + (i + 0.5) * _t.Cell - x, _t.Z0 + (j + 0.5) * _t.Cell - zz) <= rad + cr) _t.LandGrid[j * _t.GW + i] = 0;
+                        }
+                    _t.Props.Add(prop);
+                    mine.Add(prop);
+                    return true;
+                }
+                double[] leanD = TG.Nums("leanD"), leanW = TG.Nums("leanW"), leanH = TG.Nums("leanH");
+                int n = W.Int("n");
+                foreach (double f in TG.Nums("leanFaces"))
+                {   // lean-tos on the barrier (arguments drawn in the web game's order)
+                    double d = leanD[0] + Rn() * leanD[1];
+                    double ang = z.Gate + f / n * turn + (Rn() - 0.5) * TG.Num("leanJitter");
+                    double w = leanW[0] + Rn() * leanW[1];
+                    double h = leanH[0] + Rn() * leanH[1];
+                    Put(ang, R0 + d / 2 - TG.Num("leanIn"), w, d, h, "leanto");
+                }
+                var B = TG.Obj("block");
+                var L = TG.Obj("leanto");
+                var Tk = TG.Obj("tanks");
+                var Y = TG.Obj("yard");
+                for (int k = 0; k < TG.Int("tries") && mine.Count < TG.Int("max"); k++)
+                {
+                    double ang = z.Gate + (Rn() < TG.Num("sideChance")
+                        ? (Rn() < TG.Num("sideSplit") ? 1 : -1) * (TG.Num("sideMin") + Rn() * TG.Num("sideSpread"))
+                        : Rn() * turn);
+                    double rr = R0 + TG.Num("ringOut") + DMath.Pow(Rn(), TG.Num("ringPow")) * TG.Num("ringSpread");
+                    double t = Rn();
+                    if (t < TG.Num("blockChance"))
+                    {
+                        double w = B.Nums("w")[0] + Rn() * B.Nums("w")[1], d = B.Nums("d")[0] + Rn() * B.Nums("d")[1];
+                        double h = B.Nums("h")[0] + Math.Floor(Rn() * 2) * B.Nums("h")[1];
+                        Put(ang, rr, w, d, h, "block");
+                    }
+                    else if (t < TG.Num("leanChance"))
+                    {
+                        double w = L.Nums("w")[0] + Rn() * L.Nums("w")[1], d = L.Nums("d")[0] + Rn() * L.Nums("d")[1], h = L.Nums("h")[0] + Rn() * L.Nums("h")[1];
+                        Put(ang, rr, w, d, h, "leanto");
+                    }
+                    else if (t < TG.Num("tanksChance")) Put(ang, rr, Tk.Num("w"), Tk.Num("d"), Tk.Num("h"), "tanks");
+                    else Put(ang, rr, Y.Num("w"), Y.Num("d"), Y.Num("h"), "yard");
+                }
+            }
+        }
+
         // ---------- plots per base and their kinds ----------
 
         void PlotsFor(Zone z, ZoneType ZT)
@@ -595,7 +679,7 @@ namespace DawgsUprising.Sim
                 else z.Slots.Fort++;
             }
             z.Spots = plots;   // buildings are placed freely now; these laid-out spots are suggestions (and the AI's choices)
-            z.Plots = new List<object>();
+            z.Plots = new List<Plot>();
         }
     }
 }

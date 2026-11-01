@@ -65,6 +65,9 @@ dotnet run -c Release
 It prints one line per check and `TESTS PASSED n/n` when everything matches the web game. Run it before every push.
 A check that crashes counts as a failure. The checks compare the SIM with recordings of the web game in
 `tests/golden/`; when `web/` changes, re-record them with the scripts in `tools/` and commit them with the port change.
+The port matches V8 12.4's maths (Node 22). Newer V8 computes `Math.pow` differently in the last bit, so the recording
+scripts install V8 12.4's `pow` (`tools/v8_pow.js`) and give the same files on any Node version; only `tools/web_math.js`,
+which records V8's own maths, needs Node 22.
 
 ## Port status
 
@@ -73,9 +76,10 @@ A check that crashes counts as a failure. The checks compare the SIM with record
 - [x] SIM phase 1: exact maths, maps, Chaos Isles, terrain, pathfinding, spatial hash, unit/base tables (identical to web v22.5)
 - [x] SIM phase 2a: battle setup (armies, bases, start slots) and build plots (runways, streets, quays, plots, levelling)
 - [x] SIM phase 2b: units, orders (move, attack-move, attack, stop, formations, stances, guard), movement, combat, projectiles (ground units, helicopters and boats; checked tick by tick against 5 web scenarios)
-- [ ] SIM: the rest of the core loop (starting garrisons and squads, rovers and construction, recruiting, healing)
+- [x] SIM: walls at setup (courtyards, gates, a grid per team, Town outgrowth), starting garrisons, squads and buildings, healing (identical to web at setup and in 2 more scenarios)
+- [ ] SIM: construction (rovers building), recruiting and units coming out of their base
 - [ ] SIM: zones, base types, capture, garrisons
-- [ ] SIM: walls, gates, team grids, manning
+- [ ] SIM: gates opening, breaching and rebuilding, manning the walls
 - [ ] SIM: air (airbase cycle, carriers), naval
 - [ ] SIM: AI (`aiThink`, `carrierAI`)
 - [ ] SIM: fog of war

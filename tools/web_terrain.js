@@ -16,6 +16,7 @@ simSrc = simSrc.replace(HOOK_AT, HOOK_AT + 'globalThis.__terrain0={map:{hv:map.h
 const ctx = { module: { exports: {} }, console };
 ctx.structuredClone = structuredClone;
 vm.createContext(ctx);
+require('./v8_pow.js').install(ctx);   // V8 12.4's Math.pow, so the recording is the same on any Node version
 vm.runInContext(simSrc, ctx, { filename: 'web-sim.js' });
 const SIM = ctx.module.exports;
 const version = (page.match(/GAME_VERSION=\{number:'([^']+)'/) || [])[1] || '?';

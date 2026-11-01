@@ -65,9 +65,21 @@ namespace DawgsUprising.Sim
     {
         public int I;
         public double X, Z, Y, Ang;
-        public int? Fac;
+        public FacilityState Fac;   // the building on it, or null
         public string Tag, Kind;
-        public Point Water;   // nearest water cell for a naval yard, or null
+        public Point Water;         // nearest water cell for a naval yard, or null
+        public int? Zone;           // a placed building's base
+        public bool Used;           // a laid-out spot something was built on
+        public Unit Body;           // the building's hit points, as a structure unit
+    }
+
+    /// <summary>A building on a plot (web plot.fac): type, level, building/ready state and production timers.</summary>
+    public sealed class FacilityState
+    {
+        public string Type, State, Pstate;
+        public int Level, ProdI;
+        public double T, Dur, ProdT;   // web t and T: build progress so far and the time it takes
+        public Unit Unit;
     }
 
     /// <summary>A base (web G.zones[i]). Field names follow the web game.</summary>
@@ -88,7 +100,16 @@ namespace DawgsUprising.Sim
         public int Budget;
         public ZoneSlots Slots;
         public List<Plot> Spots;
-        public List<object> Plots;
+        public List<Plot> Plots;
+        // walls (walled base types only)
+        public WallDef Wall;
+        public bool Walled, Breached;
+        public double BreachT, GateOpen, GateHold;
+        public Unit GateU;
+        public List<int> WallCells, Yard;   // the base's cells, and the open courtyard cells garrisons stand on
+        public int? Drill;                  // drill level (null = 1)
+        public bool Hosp;                   // Field Hospital upgrade
+        public double Msl, MslT;            // ballistic missiles stocked, and the build timer
     }
 
     /// <summary>
@@ -188,6 +209,9 @@ namespace DawgsUprising.Sim
             Streets = plots.Streets;
             AirCorr = plots.AirCorr;
             checkpoint?.Invoke("plots", this);
+            SetupWalls(plots);
+            SetupForces();
+            checkpoint?.Invoke("forces", this);
         }
 
         string Difficulty(int f)
@@ -349,10 +373,11 @@ namespace DawgsUprising.Sim
             if (Terrain == null) return;   // balance-only battles just keep time
             // Web tick() order: rebuildHash, airbaseUpkeep, updateUnit (each unit), separate, updateProjectiles, then
             // recruitTick, autoMan, every 0.25 s updateZones/produce/updateFacilities, economy, missiles, heal every 0.5 s,
-            // carrierTick, faction AI and visibility every 0.2 s. Ported so far: the unit systems.
-            UnitSystems(dt);
+            // carrierTick, faction AI and visibility every 0.2 s. Ported so far: the unit systems and healing.
+            if ((Opts.Systems & Systems.Units) != 0) UnitSystems(dt);
+            if ((Opts.Systems & Systems.Heal) != 0) { _healT += dt; if (_healT >= Balance.Obj("heal").Num("every")) { Heal(_healT); _healT = 0; } }
             _cleanT += dt;
-            if (_cleanT >= 1) { Units = Units.FindAll(u => u.Alive); _cleanT = 0; }   // drop the dead every second
+            if (_cleanT >= Balance.Obj("engine").Num("cleanEvery")) { Units = Units.FindAll(u => u.Alive); _cleanT = 0; }   // drop the dead every second
         }
 
         /// <summary>Fingerprint of the game state, to spot machines drifting apart in multiplayer.

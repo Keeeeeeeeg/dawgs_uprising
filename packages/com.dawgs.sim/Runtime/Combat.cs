@@ -105,11 +105,11 @@ namespace DawgsUprising.Sim
             if (t.Hp <= 0)
             {
                 t.Alive = false;
-                Factions[t.F].Losses++;
+                Factions[t.F.Value].Losses++;
                 if (f != null)
                 {
                     Factions[f.Value].Kills++;
-                    Factions[t.F].Aggro[f.Value] += t.Def.IsVeh ? _ur.AG.Num("killVeh") : _ur.AG.Num("killInf");
+                    Factions[t.F.Value].Aggro[f.Value] += t.Def.IsVeh ? _ur.AG.Num("killVeh") : _ur.AG.Num("killInf");
                 }
                 Emit("death", t);
                 // (destroyed buildings arrive with construction)

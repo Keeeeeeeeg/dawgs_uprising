@@ -9,6 +9,7 @@ const page = fs.readFileSync(html, 'utf8');
 const simSrc = [...page.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).find(s => s.includes('SIMULATION CORE'));
 const ctx = { module: { exports: {} }, console };
 vm.createContext(ctx);
+require('./v8_pow.js').install(ctx);   // V8 12.4's Math.pow, so the recording is the same on any Node version
 vm.runInContext(simSrc, ctx, { filename: 'web-sim.js' });
 const SIM = ctx.module.exports;
 const version = (page.match(/GAME_VERSION=\{number:'([^']+)'/) || [])[1] || '?';

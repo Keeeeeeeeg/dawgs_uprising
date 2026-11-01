@@ -15,12 +15,23 @@ if (!src.includes(RND)) throw new Error('rnd definition not found');
 src = src.replace(RND, 'const __r=mulberry32((opts.rngSeed||seed)^0x9e3779b9);let __rc=0;const rnd=()=>{__rc++;return __r();};globalThis.__cp={};');
 // checkpoint 2: build plots laid out (streets, runways, plots, levelled ground)
 hook('  // ---- buildings: placed by Construction Rovers', "globalThis.__cp.plots={rc:__rc,zones:structuredClone(G.zones.map(z=>({id:z.id,gate:z.gate,budget:z.budget,port:z.port,slots:z.slots,spots:z.spots,air:z.air,cove:z.cove,y:z.y}))),streets:structuredClone(streets),hv:require_sha(hv),pass:require_sha(pass)};\n");
+// checkpoint 3: starting forces (walls, courtyards, gates, garrisons, squads, starting buildings)
+hook('  // ---- campaign: pre-battle bonuses', "globalThis.__cp.forces={rc:__rc,nextId:G.nextId," +
+  "units:G.units.map(u=>({id:u.id,type:u.type,f:u.f,x:u.x,z:u.z,ang:u.ang,hp:u.hp,maxHp:u.maxHp,cd:u.cd,acqT:u.acqT,ax:u.ax,az:u.az,lx:u.lx,lz:u.lz," +
+  "garrison:u.garrison,zoneMade:u.zoneMade??null,home:u.home??null,roverHome:u.roverHome??null,gateOf:u.gateOf??null,garFlag:!!u.garFlag})),"  +
+  "zones:G.zones.map(z=>({id:z.id,walled:!!z.walled,breached:!!z.breached,gateOpen:z.gateOpen??null,gateU:z.gateU?z.gateU.id:null," +
+  "wallCells:z.wallCells?require_sha(new Int32Array(z.wallCells)):null,yard:z.yard?require_sha(new Int32Array(z.yard)):null,msl:z.msl,mslT:z.mslT," +
+  "used:z.spots.map(s=>!!s.used),plots:z.plots.map(p=>({i:p.i,x:p.x,z:p.z,y:p.y,ang:p.ang,kind:p.kind,zone:p.zone,water:p.water||null,body:p.body?p.body.id:null," +
+  "fac:p.fac&&{type:p.fac.type,level:p.fac.level,state:p.fac.state,t:p.fac.t,T:p.fac.T,prodT:p.fac.prodT,prodI:p.fac.prodI,pstate:p.fac.pstate}}))}))," +
+  "props:map.props.filter(p=>p.town!=null).map(p=>structuredClone(p)),pass:require_sha(pass),cellZone:require_sha(cellZone),wallCell:require_sha(wallCell)," +
+  "teamPass:teamPass.map(require_sha)};\n");
 // checkpoint 1: armies and bases set up (before build plots)
 hook('  // ---- build plots: each base grows', 'globalThis.__cp.zones={rc:__rc,factions:structuredClone(F),zones:structuredClone(G.zones),home:G.home,homes:G.homes.slice()};\n');
 const crypto = require('crypto');
 const require_sha = a => crypto.createHash('sha256').update(Buffer.from(a.buffer, a.byteOffset, a.byteLength)).digest('hex');
 const ctx = { module: { exports: {} }, console, structuredClone, require_sha };
 vm.createContext(ctx);
+require('./v8_pow.js').install(ctx);   // V8 12.4's Math.pow, so the recording is the same on any Node version
 vm.runInContext(src, ctx, { filename: 'web-sim.js' });
 const SIM = ctx.module.exports;
 const version = (page.match(/GAME_VERSION=\{number:'([^']+)'/) || [])[1] || '?';

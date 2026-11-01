@@ -1,7 +1,8 @@
-// Reference results for the SIM's DMath from V8 itself (run with the same Node as tools/web_trace.js).
+// Reference results for the SIM's DMath from V8 itself. Needs Node 22 (V8 12.4), the V8 the port reproduces.
 //   node tools/web_math.js tests/golden/math.json
 // Inputs and outputs are stored as 64-bit hex patterns so the SIM tests can compare every bit.
 'use strict';
+if (!process.versions.v8.startsWith('12.4.')) { console.error('web_math.js records V8 Math itself, so it needs the V8 the port matches: Node 22 (V8 12.4). This is V8 ' + process.versions.v8 + '.'); process.exit(2); }
 const fs = require('fs');
 const out = process.argv[2];
 if (!out) { console.error('usage: node tools/web_math.js <out.json>'); process.exit(2); }

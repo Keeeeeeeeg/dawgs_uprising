@@ -60,6 +60,16 @@ namespace DawgsUprising.Sim
         public ColorCfg Color;
     }
 
+    /// <summary>The SIM's systems, each ticked in the web game's order. All of them run in a battle; tests that replay a
+    /// web scenario recorded with only some of them switched on run the same ones.</summary>
+    [System.Flags]
+    public enum Systems
+    {
+        Units = 1,    // spatial hash, each unit's update, pushing apart, projectiles
+        Heal = 2,     // units recovering in friendly bases
+        All = ~0,
+    }
+
     /// <summary>Battle options, like the web createGame options.</summary>
     public sealed class BattleOptions
     {
@@ -68,5 +78,8 @@ namespace DawgsUprising.Sim
         public List<HumanCfg> Humans;
         public List<AiCfg> Ai;
         public bool EasyAI, PassiveAI, NoStartZones;
+        /// <summary>Tests: start without garrisons, squads or starting buildings.</summary>
+        public bool Bare;
+        public Systems Systems = Systems.All;
     }
 }

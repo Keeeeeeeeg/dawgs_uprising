@@ -1,10 +1,10 @@
 // Unit scenarios from the web game's SIM: units, orders, movement and combat on their own.
 //   node tools/web_units.js web/dawgs_uprising_v22.5.html tests/golden/units.json
 // Test-only hooks in a copy of the SIM source (nothing is published):
-//  - "bare" battles start with no garrisons, squads or starting buildings,
-//  - walls are left out (BALANCE.walls.types emptied; walls are ported later),
+//  - "bare" battles start with no garrisons, squads or starting buildings (per scenario; default bare),
+//  - walls can be left out (BALANCE.walls.types emptied; per scenario; default off),
 //  - each tick runs only the unit systems: spatial hash, updateUnit, separate, projectiles and dead-unit cleanup
-//    (no AI, production, economy, capture, healing or fog),
+//    (no AI, production, economy, capture or fog), plus healing when the scenario lists it in "systems",
 //  - the battle's random generator is reseeded when the scenario starts.
 // Each scenario is a script (spawns and orders at given ticks). Every tick gets a fingerprint of all units, and every
 // second the full state of every unit, projectile and army is recorded exactly, so a port that drifts shows when and where.
@@ -23,13 +23,15 @@ swap('  if(!CVM)for(let f=0;f<NF;f++){\n    const hq=', '  if(!CVM&&!globalThis.
 swap('  if(ST.airbaseHangar)for', '  if(ST.airbaseHangar&&!globalThis.__bare)for');
 swap('  function tick(dt){\n    G.time+=dt;\n',
   '  function tick(dt){\n    if(globalThis.__unitsOnly){G.time+=dt;pathBudget=10;rebuildHash();for(const u of G.units)if(u.alive)updateUnit(u,dt);separate(dt);updateProjectiles(dt);\n' +
+  '      if(globalThis.__heal){healT+=dt;if(healT>=.5){heal(healT);healT=0;}}\n' +
   '      cleanT+=dt;if(cleanT>=1){G.units=G.units.filter(u=>u.alive);cleanT=0;}return;}\n    G.time+=dt;\n');
 const ctx = { module: { exports: {} }, console };
 vm.createContext(ctx);
+require('./v8_pow.js').install(ctx);   // V8 12.4's Math.pow, so the recording is the same on any Node version
 vm.runInContext(src, ctx, { filename: 'web-sim.js' });
 const SIM = ctx.module.exports;
 const version = (page.match(/GAME_VERSION=\{number:'([^']+)'/) || [])[1] || '?';
-SIM.BALANCE.walls.types = [];
+const WALL_TYPES = SIM.BALANCE.walls.types.slice();
 
 const dv = new DataView(new ArrayBuffer(8));
 const hex = x => { dv.setFloat64(0, x); return dv.getBigUint64(0).toString(16).padStart(16, '0'); };
@@ -46,8 +48,9 @@ const unitRow = u => [u.id, u.type, u.f, u.alive, u.mode, hex(u.x), hex(u.z), he
   idOf(u.target), idOf(u.forced), u.path ? u.path.length : -1, u.pi, u.deployed, hex(u.deployT), idOf(u.lastHitBy), u.stance || null, u.guard ? idOf(u.guard.t) : -1];
 const projRow = p => [idOf(p.src), idOf(p.tgt), p.wpn, hex(p.ex), hex(p.ez), hex(p.t), hex(p.T)];
 
-// scenarios: spawns [type, f, x, z] and orders [f, kind, ids, a, b] at a tick. Unit ids are the ones spawnUnit
-// hands out, in spawn order; an order's target unit is written {uid}.
+// scenarios: spawns [type, f, x, z], orders [f, kind, ids, a, b] and hurt [id, hp] (set a unit's health) at a tick.
+// Unit ids are the ones spawnUnit hands out, in spawn order; an order's target unit is written {uid}. Options: bare
+// (default true), walls (default false), systems (default ['units']; 'heal' adds healing every 0.5 s).
 function sq(types, f, x, z, gap) { return types.map((t, i) => [t, f, x + (i % 4) * gap, z + Math.floor(i / 4) * gap]); }
 const SCENARIOS = [
   { name: 'march', map: 'dawgs', seed: 1, rseed: 101, seconds: 30, script: (S) => [
@@ -81,11 +84,29 @@ const SCENARIOS = [
     { at: 0, spawn: [['boat', 3, -40, -205], ['boat', 3, -36, -208]] },
     { at: 0, order: [0, 'amove', [S.id(0), S.id(1), S.id(2)], -60, -205] },
     { at: 0, order: [3, 'amove', [S.id(3), S.id(4)], -140, -205] }] },
+  { name: 'heal', map: 'dawgs', seed: 1, rseed: 606, seconds: 30, systems: ['units', 'heal'], script: (S) => [
+    // Cape Ember is army 0's HQ (313, 78): its own wounded recover there, a vehicle can (HQs repair), an enemy can't
+    { at: 0, spawn: [['rifle', 0, 310, 80], ['mg', 0, 316, 76], ['mtank', 0, 320, 84], ['rifle', 1, 306, 72], ['rifle', 0, 250, 60]] },
+    { at: 0, hurt: [[S.id(0), 10], [S.id(1), 20], [S.id(2), 100], [S.id(3), 15], [S.id(4), 12]] },
+    { at: 0, order: [1, 'stance', [S.id(3)], 'hold'] },
+    { at: 0, order: [0, 'stance', [S.id(0), S.id(1), S.id(2)], 'hold'] },
+    { at: 300, order: [0, 'move', [S.id(4)], 312, 82] }] },
+  { name: 'walls', map: 'dawgs', seed: 1, rseed: 707, seconds: 40, bare: false, walls: true, script: (S) => [
+    // a full battle start (walls, gates, garrisons, squads, starting buildings): an army 0 company attack-moves into
+    // Kelp Works (army 2's walled Town, closed to them, so their path ends at its gate) and two riflemen are sent into
+    // army 1's Copperhill courtyard
+    { at: 0, spawn: sq(['rifle', 'rifle', 'rifle', 'rifle', 'mg', 'at', 'ltank', 'mtank'], 0, 112, 48, 2.2) },
+    { at: 0, spawn: [['rifle', 0, -62, 60], ['rifle', 0, -60, 62]] },
+    { at: 0, order: [0, 'amove', S.ids(0, 8), 75, 53] },
+    { at: 0, order: [0, 'move', [S.id(8), S.id(9)], -100, 53] }] },
 ];
 
 function run(sc) {
-  ctx.__bare = true;
+  const bare = sc.bare !== false, walls = !!sc.walls, systems = sc.systems || ['units'];
+  ctx.__bare = bare;
   ctx.__unitsOnly = true;
+  ctx.__heal = systems.includes('heal');
+  SIM.BALANCE.walls.types = walls ? WALL_TYPES.slice() : [];
   const G = SIM.createGame({ map: sc.map, seed: sc.seed });
   ctx.__reseed(sc.rseed);
   const id0 = G.nextId;
@@ -100,6 +121,7 @@ function run(sc) {
   for (let k = 0; k <= ticks; k++) {
     for (const a of actions) if (a.at === k) {
       if (a.spawn) for (const [t, f, x, z] of a.spawn) G.spawnUnit(t, f, x, z);
+      if (a.hurt) for (const [id, hp] of a.hurt) G.units.find(u => u.id === id).hp = hp;
       if (a.order) { const [f, kind, ids, x, z] = a.order; const A = x && x.uid != null ? G.units.find(u => u.id === x.uid) : x; G.orderAs(f, kind, ids, A, z); }
     }
     if (k % every === 0) snap(k);
@@ -109,8 +131,9 @@ function run(sc) {
   }
   const last = snaps[snaps.length - 1];
   console.log(`${sc.name}: ${ticks} ticks, ${last.units.filter(u => u[3]).length} units alive, events ${JSON.stringify(events)}`);
-  ctx.__bare = ctx.__unitsOnly = false;
-  return { map: sc.map, seed: sc.seed, rseed: sc.rseed, ticks, id0, actions, tickFp, snaps };
+  ctx.__bare = ctx.__unitsOnly = ctx.__heal = false;
+  SIM.BALANCE.walls.types = WALL_TYPES.slice();
+  return { map: sc.map, seed: sc.seed, rseed: sc.rseed, bare, walls, systems, ticks, id0, actions, tickFp, snaps };
 }
 
 const res = {};

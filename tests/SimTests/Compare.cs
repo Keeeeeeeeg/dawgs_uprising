@@ -75,10 +75,11 @@ namespace DawgsUprising.Sim.Tests
             using (var h = SHA256.Create()) return BitConverter.ToString(h.ComputeHash(b)).Replace("-", "").ToLowerInvariant();
         }
 
-        public static string Sha(float[] f)
+        /// <summary>SHA-256 of an array's bytes (little-endian, like the web game's typed arrays).</summary>
+        public static string Sha(Array a)
         {
-            var b = new byte[f.Length * 4];
-            Buffer.BlockCopy(f, 0, b, 0, b.Length);
+            var b = new byte[Buffer.ByteLength(a)];
+            Buffer.BlockCopy(a, 0, b, 0, b.Length);
             return Sha(b);
         }
 

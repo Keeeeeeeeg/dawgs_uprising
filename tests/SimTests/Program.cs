@@ -60,7 +60,7 @@ namespace DawgsUprising.Sim.Tests
             try { check(); }
             catch (Exception e)
             {
-                string at = e.StackTrace?.Split('\n').FirstOrDefault()?.Trim() ?? "";
+                string at = e.StackTrace?.Split('\n').FirstOrDefault(l => l.Contains("DawgsUprising"))?.Trim() ?? "";
                 Ok(false, $"check '{name}' crashed: {e.GetType().Name}: {e.Message} ({at})");
             }
         }
@@ -393,6 +393,7 @@ namespace DawgsUprising.Sim.Tests
                 Battle sim = null;
                 var problems = new List<string>();
                 var p2 = new List<string>();
+                var p3 = new List<string>();
                 int spots = 0;
                 sim = new Battle(Program.Game, Opts(g.Obj("opts")), (cp, s) =>
                 {
@@ -418,12 +419,49 @@ namespace DawgsUprising.Sim.Tests
                         if (Compare.Sha(s.Terrain.LandGrid) != c.Str("pass")) p2.Add($"walkable grid differs ({Compare.Count(s.Terrain.LandGrid)} cells)");
                         foreach (var z in s.Zones) spots += z.Spots?.Count ?? 0;
                     }
+                    else if (cp == "forces" && cps.Has("forces")) p3.AddRange(ForcesDiff(cps.Obj("forces"), s));
                 });
                 double secs = sw.Elapsed.TotalSeconds;
                 Program.Ok(problems.Count == 0, $"setup {name}: {sim.Factions.Count} armies, {sim.Zones.Count} bases identical to web after {cps.Obj("zones").Int("rc")} draws ({secs:F2} s) {string.Join("; ", problems)}");
                 if (cps.Has("plots"))
                     Program.Ok(p2.Count == 0, $"setup {name} plots: {sim.Streets.Count} streets, {spots} plots identical to web {string.Join("; ", p2)}");
+                if (cps.Has("forces"))
+                {
+                    var f = cps.Obj("forces");
+                    int walled = sim.Zones.Count(z => z.Walled), props = sim.Terrain.Props.Count(p => p.Town != null);
+                    Program.Ok(p3.Count == 0, $"setup {name} forces: {sim.Units.Count} units, {walled} walled bases, {props} town props, {sim.TeamPass.Length} team grids identical to web after {f.Int("rc")} draws {string.Join("; ", p3)}");
+                }
             }
+        }
+
+        /// <summary>Checkpoint 3: walls, courtyards, gates, garrisons, squads and starting buildings.</summary>
+        static List<string> ForcesDiff(JObj c, Battle s)
+        {
+            var o = new List<string>();
+            void Add(string d) { if (d != "") o.Add(d); }
+            if (s.Rnd.Draws != c.Int("rc")) o.Add($"random draws {s.Rnd.Draws}, web {c.Int("rc")}");
+            if (s.NextId != c.Int("nextId")) o.Add($"next unit id {s.NextId}, web {c.Int("nextId")}");
+            Add(Compare.FirstDiff(c["units"], s.Units, "units"));
+            object Fac(FacilityState f) => f == null ? null : new Dictionary<string, object> { ["type"] = f.Type, ["level"] = f.Level, ["state"] = f.State,
+                ["t"] = f.T, ["T"] = f.Dur, ["prodT"] = f.ProdT, ["prodI"] = f.ProdI, ["pstate"] = f.Pstate };
+            var zones = s.Zones.Select(z => new Dictionary<string, object>
+            {
+                ["id"] = z.Id, ["walled"] = z.Walled, ["breached"] = z.Breached, ["gateOpen"] = z.Walled ? (object)z.GateOpen : null,
+                ["gateU"] = z.GateU?.Id, ["wallCells"] = z.WallCells == null ? null : Compare.Sha(z.WallCells.ToArray()),
+                ["yard"] = z.Yard == null ? null : Compare.Sha(z.Yard.ToArray()), ["msl"] = z.Msl, ["mslT"] = z.MslT,
+                ["used"] = z.Spots.Select(p => (object)p.Used).ToList(),
+                ["plots"] = z.Plots.Select(p => (object)new Dictionary<string, object> { ["i"] = p.I, ["x"] = p.X, ["z"] = p.Z, ["y"] = p.Y, ["ang"] = p.Ang,
+                    ["kind"] = p.Kind, ["zone"] = p.Zone, ["water"] = p.Water, ["body"] = p.Body?.Id, ["fac"] = Fac(p.Fac) }).ToList(),
+            }).ToList();
+            Add(Compare.FirstDiff(c["zones"], zones, "zones"));
+            Add(Compare.FirstDiff(c["props"], s.Terrain.Props.Where(p => p.Town != null).ToList(), "props"));
+            if (Compare.Sha(s.Terrain.LandGrid) != c.Str("pass")) o.Add($"walkable grid differs ({Compare.Count(s.Terrain.LandGrid)} cells)");
+            if (Compare.Sha(s.CellZone) != c.Str("cellZone")) o.Add("courtyard cells differ");
+            if (Compare.Sha(s.WallCell) != c.Str("wallCell")) o.Add("wall cells differ");
+            var tp = c.Arr("teamPass");
+            if (tp.Count != s.TeamPass.Length) o.Add($"{s.TeamPass.Length} team grids, web {tp.Count}");
+            else for (int t = 0; t < tp.Count; t++) if (Compare.Sha(s.TeamPass[t]) != (string)tp[t]) { o.Add($"team {t}'s grid differs"); break; }
+            return o;
         }
     }
 }

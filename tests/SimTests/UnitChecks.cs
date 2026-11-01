@@ -35,7 +35,7 @@ namespace DawgsUprising.Sim.Tests
 
         static int IdOf(Unit u) => u == null ? -1 : u.Id;
 
-        static List<object> UnitRow(Unit u) => new List<object> { (double)u.Id, u.Type, (double)u.F, u.Alive, u.Mode, Hex(u.X), Hex(u.Z), Hex(u.Ang), Hex(u.Hp),
+        static List<object> UnitRow(Unit u) => new List<object> { (double)u.Id, u.Type, u.F == null ? null : (object)(double)u.F.Value, u.Alive, u.Mode, Hex(u.X), Hex(u.Z), Hex(u.Ang), Hex(u.Hp),
             Hex(u.MaxHp), Hex(u.Cd), Hex(u.AcqT), (double)IdOf(u.Target), (double)IdOf(u.Forced), (double)(u.Path == null ? -1 : u.Path.Count), (double)u.Pi,
             u.Deployed, Hex(u.DeployT), (double)IdOf(u.LastHitBy), u.Stance, (double)(u.Guard == null ? -1 : IdOf(u.Guard.T)) };
 
@@ -94,6 +94,17 @@ namespace DawgsUprising.Sim.Tests
             return a;
         }
 
+        static GameData _noWalls;
+        /// <summary>The game data with walls switched off, as tools/web_units.js records the scenarios.</summary>
+        static GameData NoWalls()
+        {
+            if (_noWalls != null) return _noWalls;
+            var g = Program.Game;
+            var bal = (JObj)Json.Parse(Program.Read(Program.Data, "balance.json"));
+            bal.Obj("walls")["types"] = new List<object>();
+            return _noWalls = new GameData { Balance = bal, Maps = g.Maps, Mapgen = g.Mapgen, Factions = g.Factions };
+        }
+
         public static void Units()
         {
             var golden = (JObj)Program.Load(Path.Combine(Program.Golden, "units.json"));
@@ -102,7 +113,9 @@ namespace DawgsUprising.Sim.Tests
             foreach (var name in runs.Keys)
             {
                 var g = runs.Obj(name);
-                var b = new Battle(Program.Game, new BattleOptions { Map = g.Str("map"), Seed = (long)g.Num("seed") });
+                var systems = Systems.Units;
+                foreach (string s in g.Arr("systems") ?? new List<object>()) if (s == "heal") systems |= Systems.Heal;
+                var b = new Battle(g.Bool("walls") ? Program.Game : NoWalls(), new BattleOptions { Map = g.Str("map"), Seed = (long)g.Num("seed"), Bare = g.Bool("bare"), Systems = systems });
                 b.Rnd = new Sim.Rng((long)g.Num("rseed"));
                 if (b.NextId != g.Int("id0")) { Program.Ok(false, $"units {name}: first unit id {b.NextId}, web {g.Int("id0")}"); continue; }
                 var events = new Dictionary<string, int>();
@@ -118,6 +131,8 @@ namespace DawgsUprising.Sim.Tests
                     {
                         if (a.Has("spawn"))
                             foreach (List<object> s in a.Arr("spawn")) b.SpawnUnit((string)s[0], (int)(double)s[1], (double)s[2], (double)s[3]);
+                        if (a.Has("hurt"))
+                            foreach (List<object> h in a.Arr("hurt")) b.Units.Find(u => u.Id == (int)(double)h[0]).Hp = (double)h[1];
                         if (a.Has("order"))
                         {
                             var o = a.Arr("order");
