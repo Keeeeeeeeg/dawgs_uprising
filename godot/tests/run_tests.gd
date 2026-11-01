@@ -9,6 +9,7 @@ extends Node
 const SIM_DIR := "res://sim"
 const SimCore := preload("res://sim/sim.gd")
 const Rng := preload("res://sim/rng.gd")
+const DMath := preload("res://sim/dmath.gd")
 const GOLDEN := "res://tests/golden" # recorded from the web SIM by tools/web_trace.js
 const CHUNK := 0.25 # matches the web harness: G.update() is stepped in 0.25 s chunks
 const SECONDS := 30.0
@@ -24,6 +25,7 @@ func _ready() -> void:
 	_check_sim_steps()
 	_check_sim_is_pure()
 	_check_rng_matches_web()
+	_check_dmath_matches_v8()
 	var total := _passed + _failed
 	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
 	print(summary)
@@ -128,3 +130,42 @@ func _check_rng_matches_web() -> void:
 				bad = i
 				break
 		_ok(bad == -1, "rng seed %s matches web for %d values%s" % [key, want.size(), "" if bad == -1 else " (differs at %d)" % bad])
+
+
+## sim/dmath.gd must reproduce V8's Math functions bit for bit (tests/golden/math.json, from tools/web_math.js).
+func _check_dmath_matches_v8() -> void:
+	var golden := Balance.load_file(GOLDEN.path_join("math.json"))
+	var cases: Dictionary = golden.get("cases", {})
+	_ok(not cases.is_empty(), "golden math.json loads (V8 %s)" % golden.get("v8", "?"))
+	var fns := {
+		"sin": func(a: Array) -> float: return DMath.sin_(a[0]),
+		"cos": func(a: Array) -> float: return DMath.cos_(a[0]),
+		"atan2": func(a: Array) -> float: return DMath.atan2_(a[0], a[1]),
+		"pow": func(a: Array) -> float: return DMath.pow_(a[0], a[1]),
+		"hypot": func(a: Array) -> float: return DMath.hypot(a[0], a[1]),
+		"hypot3": func(a: Array) -> float: return DMath.hypot3(a[0], a[1], a[2]),
+		"round": func(a: Array) -> float: return DMath.round_js(a[0]),
+	}
+	for name: String in fns:
+		var rows: Array = cases.get(name, [])
+		var bad := 0
+		var first := ""
+		for row: Array in rows:
+			var args: Array = []
+			for i in row.size() - 1:
+				args.append(_hex_float(row[i]))
+			var want := _hex_bits(row[row.size() - 1])
+			var got: float = fns[name].call(args)
+			if DMath.bits(got) != want and not (is_nan(got) and is_nan(DMath._f(want))):
+				bad += 1
+				if first.is_empty():
+					first = " first: %s(%s) = %s, V8 %s" % [name, str(args), got, DMath._f(want)]
+		_ok(rows.size() > 0 and bad == 0, "dmath %s matches V8 bit for bit on %d inputs%s" % [name, rows.size(), "" if bad == 0 else " (%d differ;%s)" % [bad, first]])
+
+
+static func _hex_bits(h: String) -> int:
+	return (h.substr(0, 8).hex_to_int() << 32) | h.substr(8, 8).hex_to_int()
+
+
+static func _hex_float(h: String) -> float:
+	return DMath._f(_hex_bits(h))
