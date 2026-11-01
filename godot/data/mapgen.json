@@ -1,0 +1,176 @@
+{
+ "_about": "Map generation numbers (the web SIM's genMap, makeChaosMap, convertMap and scaleMap). Fixed maps live in maps.json; these drive the maps rolled at runtime (Chaos Isles).",
+ "mapScale": 1.25,
+ "sizeStep": 5,
+ "neckWidth": 6.5,
+ "chaos": {
+  "W": 1120,
+  "H": 860,
+  "zones": 66,
+  "spacing": 50,
+  "maxPlayers": 16,
+  "palettes": [
+   "earth",
+   "earth",
+   "desert",
+   "arctic"
+  ],
+  "minZones": 40,
+  "maxRetries": 6,
+  "seedMod": 2147483646,
+  "retryMod": 2147483000,
+  "retryStep": 7919,
+  "islands": [
+   14,
+   20
+  ],
+  "islandTries": 4000,
+  "edgeX": 90,
+  "edgeZ": 80,
+  "islandRx": [
+   60,
+   135
+  ],
+  "islandRz": [
+   55,
+   120
+  ],
+  "islandGap": 0.6,
+  "lobeChance": 0.75,
+  "lobeDx": 55,
+  "lobeDz": 50,
+  "lobeScale": [
+   0.4,
+   0.75
+  ],
+  "extraNecksDiv": 3,
+  "extraNeckJitter": [
+   0.8,
+   1.4
+  ],
+  "ridges": [
+   8,
+   14
+  ],
+  "ridgeSpread": 0.5,
+  "ridgeLen": [
+   25,
+   50
+  ],
+  "ridgeW": [
+   9,
+   13
+  ],
+  "ridgeH": [
+   8,
+   12
+  ],
+  "lakes": [
+   4,
+   9
+  ],
+  "lakeSpread": 0.4,
+  "lakeR": [
+   12,
+   22
+  ],
+  "ridgeTurn": 6.283
+ },
+ "sites": {
+  "defaultZones": 22,
+  "tries": 6000,
+  "edge": 34,
+  "landMin": 0.33,
+  "ridgeClear": 16,
+  "neckClear": 14,
+  "defaultSpacing": 56,
+  "probe": 20,
+  "probeLand": 0.15,
+  "probeNeed": 3,
+  "defaultPlayers": 4,
+  "defaultStrongholds": 1,
+  "mix": [
+   "town",
+   "outpost",
+   "town",
+   "resource",
+   "town",
+   "outpost",
+   "resource"
+  ],
+  "nameA": [
+   "Ash",
+   "Bram",
+   "Cinder",
+   "Dread",
+   "Ember",
+   "Fen",
+   "Grim",
+   "Hollow",
+   "Iron",
+   "Jag",
+   "Kestrel",
+   "Mire",
+   "Nettle",
+   "Oak",
+   "Pyre",
+   "Rook",
+   "Scorch",
+   "Thorn",
+   "Vex",
+   "Wolf",
+   "Rust",
+   "Storm",
+   "Flint",
+   "Gale",
+   "Crow",
+   "Salt",
+   "Bone",
+   "Mad"
+  ],
+  "nameB": [
+   "ford",
+   "haven",
+   "gate",
+   "wick",
+   "moor",
+   "reach",
+   "point",
+   "crag",
+   "fall",
+   "hold",
+   "mouth",
+   "stead",
+   "watch",
+   "bay",
+   "ridge",
+   "marsh",
+   "drift",
+   "end",
+   "howe",
+   "rock"
+  ]
+ },
+ "convert": {
+  "defaultR": 11,
+  "spreadDiag": 0.25,
+  "airfieldBonus": 10,
+  "ridgeNorm": 40,
+  "landNorm": 0.6,
+  "landWeight": 0.5,
+  "coastPenalty": 0.6,
+  "airSpread": 1.2,
+  "strongholdScore": 2,
+  "outpostScore": 1,
+  "fortSpread": 1.5,
+  "fallbackReachGrow": 1.5,
+  "ridgeClearStart": 99,
+  "edgeFade": 8,
+  "neckLand": 0.5,
+  "coastStep": 2,
+  "coastRays": 32,
+  "turn": 6.2832,
+  "carveDepth": 0.6,
+  "carveFloor": 0.05
+ }
+}

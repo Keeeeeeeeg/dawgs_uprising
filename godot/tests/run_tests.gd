@@ -10,6 +10,7 @@ const SIM_DIR := "res://sim"
 const SimCore := preload("res://sim/sim.gd")
 const Rng := preload("res://sim/rng.gd")
 const DMath := preload("res://sim/dmath.gd")
+const Maps := preload("res://sim/maps.gd")
 const GOLDEN := "res://tests/golden" # recorded from the web SIM by tools/web_trace.js
 const CHUNK := 0.25 # matches the web harness: G.update() is stepped in 0.25 s chunks
 const SECONDS := 30.0
@@ -21,11 +22,12 @@ var _lines: PackedStringArray = []
 
 
 func _ready() -> void:
-	_check_balance()
-	_check_sim_steps()
-	_check_sim_is_pure()
-	_check_rng_matches_web()
-	_check_dmath_matches_v8()
+	_guard("balance", _check_balance)
+	_guard("sim_steps", _check_sim_steps)
+	_guard("sim_is_pure", _check_sim_is_pure)
+	_guard("rng_matches_web", _check_rng_matches_web)
+	_guard("dmath_matches_v8", _check_dmath_matches_v8)
+	_guard("maps", _check_maps)
 	var total := _passed + _failed
 	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
 	print(summary)
@@ -34,6 +36,13 @@ func _ready() -> void:
 		get_tree().quit(0 if _failed == 0 else 1)
 	else:
 		_show(_lines, _failed == 0)
+
+
+## Runs one check; if it crashes (script error) before reaching its end, that is a failure.
+func _guard(name: String, check: Callable) -> void:
+	var finished: Variant = check.call()
+	if finished != true:
+		_ok(false, "check '%s' crashed before finishing (see the error above)" % name)
 
 
 func _ok(cond: bool, what: String) -> void:
@@ -59,7 +68,7 @@ func _show(lines: PackedStringArray, passed: bool) -> void:
 	add_child(layer)
 
 
-func _check_balance() -> void:
+func _check_balance() -> bool:
 	var b: Dictionary = Balance.data
 	_ok(not b.is_empty(), "balance.json loads")
 	for key in ["engine", "units", "weapons", "walls", "zones", "economy", "combat", "ai", "campaign", "carrier", "manning"]:
@@ -73,6 +82,7 @@ func _check_balance() -> void:
 				missing.append("%s.%s" % [k, f])
 	_ok(missing.is_empty(), "every unit has the core stats %s" % ("" if missing.is_empty() else str(missing)))
 	_ok(Balance.value("units.rifle.hp") == 45.0, "dotted lookup units.rifle.hp = 45 (web v22.5)")
+	return true
 
 
 func _run_sim() -> SimCore:
@@ -84,7 +94,7 @@ func _run_sim() -> SimCore:
 	return sim
 
 
-func _check_sim_steps() -> void:
+func _check_sim_steps() -> bool:
 	var a := _run_sim()
 	var b := _run_sim()
 	var step: float = Balance.value("engine.step")
@@ -95,14 +105,15 @@ func _check_sim_steps() -> void:
 	capped.update(10.0)
 	var max_frame: float = Balance.value("engine.maxFrame")
 	_ok(capped.time <= max_frame + 1e-9, "one long frame is capped at maxFrame (%.2f s)" % capped.time)
+	return true
 
 
 ## The SIM must stay free of nodes so it can run headless and in lockstep.
-func _check_sim_is_pure() -> void:
+func _check_sim_is_pure() -> bool:
 	var dir := DirAccess.open(SIM_DIR)
 	_ok(dir != null, "sim/ folder exists")
 	if dir == null:
-		return
+		return true
 	for file in dir.get_files():
 		if not file.ends_with(".gd"):
 			continue
@@ -113,10 +124,11 @@ func _check_sim_is_pure() -> void:
 		var banned := ["randf(", "randi(", "Balance.", "get_tree(", "Input."]
 		var found := banned.filter(func(s: String) -> bool: return src.contains(s))
 		_ok(found.is_empty(), "sim/%s uses no globals or unseeded randomness %s" % [file, "" if found.is_empty() else str(found)])
+	return true
 
 
 ## sim/rng.gd must give exactly the numbers the web game's mulberry32 gives (tests/golden/rng.json).
-func _check_rng_matches_web() -> void:
+func _check_rng_matches_web() -> bool:
 	var golden := Balance.load_file(GOLDEN.path_join("rng.json"))
 	var seqs: Dictionary = golden.get("mulberry32", {})
 	_ok(not seqs.is_empty(), "golden rng.json loads (web v%s)" % golden.get("web", "?"))
@@ -130,10 +142,11 @@ func _check_rng_matches_web() -> void:
 				bad = i
 				break
 		_ok(bad == -1, "rng seed %s matches web for %d values%s" % [key, want.size(), "" if bad == -1 else " (differs at %d)" % bad])
+	return true
 
 
 ## sim/dmath.gd must reproduce V8's Math functions bit for bit (tests/golden/math.json, from tools/web_math.js).
-func _check_dmath_matches_v8() -> void:
+func _check_dmath_matches_v8() -> bool:
 	var golden := Balance.load_file(GOLDEN.path_join("math.json"))
 	var cases: Dictionary = golden.get("cases", {})
 	_ok(not cases.is_empty(), "golden math.json loads (V8 %s)" % golden.get("v8", "?"))
@@ -161,6 +174,7 @@ func _check_dmath_matches_v8() -> void:
 				if first.is_empty():
 					first = " first: %s(%s) = %s, V8 %s" % [name, str(args), got, DMath._f(want)]
 		_ok(rows.size() > 0 and bad == 0, "dmath %s matches V8 bit for bit on %d inputs%s" % [name, rows.size(), "" if bad == 0 else " (%d differ;%s)" % [bad, first]])
+	return true
 
 
 static func _hex_bits(h: String) -> int:
@@ -169,3 +183,72 @@ static func _hex_bits(h: String) -> int:
 
 static func _hex_float(h: String) -> float:
 	return DMath._f(_hex_bits(h))
+
+
+## data/maps.json must hold every map number exactly as the web game has it, and sim/maps.gd must
+## roll the same Chaos Isles as the web game for the same seed (tests/golden/maps.json).
+func _check_maps() -> bool:
+	var maps := Maps.load_maps("res://data/maps.json")
+	var golden := Balance.load_file(GOLDEN.path_join("maps.json"))
+	var gm: Dictionary = golden.get("maps", {})
+	_ok(maps.size() == gm.size() and maps.size() > 0, "maps.json has %d maps (web v%s has %d)" % [maps.size(), golden.get("web", "?"), gm.size()])
+	var bad: Array[String] = []
+	for id: String in gm:
+		var want: Array = gm[id]
+		var got := _fingerprint(maps.get(id, {}), [])
+		if got.size() != want.size():
+			bad.append("%s: %d numbers, web %d" % [id, got.size(), want.size()])
+			continue
+		for i in want.size():
+			if got[i] != _hex_bits(want[i]):
+				bad.append("%s: number %d differs" % [id, i])
+				break
+	_ok(bad.is_empty(), "every number on all %d maps matches the web game exactly %s" % [gm.size(), "" if bad.is_empty() else str(bad)])
+	var gen := Balance.load_file("res://data/mapgen.json")
+	var chaos: Dictionary = golden.get("chaos", {})
+	for seed: String in chaos:
+		var want: Dictionary = Maps._decode(chaos[seed].map)
+		var got := Maps.make_chaos(float(seed), gen, Balance.data)
+		var diff := _first_diff(want, got, "")
+		_ok(diff.is_empty(), "Chaos Isles seed %s matches the web game (%d bases, %d islands) %s" % [seed, got.get("zones", []).size(), want.get("blobs", []).size(), diff])
+	return true
+
+
+## Every number in a map, keys sorted, as 64-bit patterns (same order as tools/export_maps.js).
+func _fingerprint(v: Variant, out: Array) -> Array:
+	if v is float or v is int:
+		out.append(DMath.bits(float(v)))
+	elif v is Array:
+		for x: Variant in v:
+			_fingerprint(x, out)
+	elif v is Dictionary:
+		var keys: Array = (v as Dictionary).keys()
+		keys.sort()
+		for k: Variant in keys:
+			_fingerprint(v[k], out)
+	return out
+
+
+## "" if `got` has everything `want` has (numbers compared exactly), else where it first differs.
+func _first_diff(want: Variant, got: Variant, at: String) -> String:
+	if (want is float or want is int) and (got is float or got is int):
+		return "" if DMath.bits(float(want)) == DMath.bits(float(got)) else "at %s: web %s, port %s" % [at, want, got]
+	if want is Array and got is Array:
+		if want.size() != got.size():
+			return "at %s: web %d items, port %d" % [at, want.size(), got.size()]
+		for i in want.size():
+			var d := _first_diff(want[i], got[i], "%s[%d]" % [at, i])
+			if not d.is_empty():
+				return d
+		return ""
+	if want is Dictionary and got is Dictionary:
+		for k: Variant in want:
+			if want[k] is bool and not want[k] and not got.has(k):
+				continue
+			if not got.has(k):
+				return "at %s.%s: missing" % [at, k]
+			var d := _first_diff(want[k], got[k], "%s.%s" % [at, k])
+			if not d.is_empty():
+				return d
+		return ""
+	return "" if want == got else "at %s: web %s, port %s" % [at, want, got]

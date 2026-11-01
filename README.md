@@ -51,7 +51,7 @@ Other folders: `web/` holds the web game the port is based on (v22.5, frozen dur
 ```
 godot --headless --path godot res://tests/run_tests.tscn
 ```
-It prints `TESTS PASSED n/n` when everything is fine. Run it before every push.
+It prints `TESTS PASSED n/n` when everything is fine. Run it before every push. A check that crashes counts as a failure. If the run never finishes, a script failed to compile: look in the Debugger's **Errors** tab.
 
 **Commit the `.uid` files.** Godot 4.7 writes a `something.gd.uid` next to each script the first time it opens the project. They belong in git; `.godot/` does not.
 
