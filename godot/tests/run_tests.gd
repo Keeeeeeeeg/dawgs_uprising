@@ -11,6 +11,7 @@ const SimCore := preload("res://sim/sim.gd")
 const Rng := preload("res://sim/rng.gd")
 const DMath := preload("res://sim/dmath.gd")
 const Maps := preload("res://sim/maps.gd")
+const Terrain := preload("res://sim/terrain.gd")
 const GOLDEN := "res://tests/golden" # recorded from the web SIM by tools/web_trace.js
 const CHUNK := 0.25 # matches the web harness: G.update() is stepped in 0.25 s chunks
 const SECONDS := 30.0
@@ -28,6 +29,7 @@ func _ready() -> void:
 	_guard("rng_matches_web", _check_rng_matches_web)
 	_guard("dmath_matches_v8", _check_dmath_matches_v8)
 	_guard("maps", _check_maps)
+	_guard("terrain", _check_terrain)
 	var total := _passed + _failed
 	var summary := "TESTS PASSED %d/%d" % [_passed, total] if _failed == 0 else "TESTS FAILED %d of %d" % [_failed, total]
 	print(summary)
@@ -252,3 +254,75 @@ func _first_diff(want: Variant, got: Variant, at: String) -> String:
 				return d
 		return ""
 	return "" if want == got else "at %s: web %s, port %s" % [at, want, got]
+
+
+## sim/terrain.gd must build the same terrain as the web game's buildMap (tests/golden/terrain0.json):
+## start slots, every height (as 32-bit floats), the passability and water grids, props and coves.
+## Big maps take a while in GDScript, so by default a spread of maps runs; FULL_TERRAIN runs all.
+const FULL_TERRAIN := false
+const TERRAIN_QUICK := ["tutorial", "dawgs", "twinreach_teams", "brine", "moon_dawgs", "chaos_s8"]
+
+
+func _check_terrain() -> bool:
+	var golden := Balance.load_file(GOLDEN.path_join("terrain0.json"))
+	var runs: Dictionary = golden.get("runs", {})
+	_ok(not runs.is_empty(), "golden terrain0.json loads (web v%s)" % golden.get("web", "?"))
+	var maps := Maps.load_maps("res://data/maps.json")
+	var gen := Balance.load_file("res://data/mapgen.json")
+	for name: String in runs:
+		if not FULL_TERRAIN and not name in TERRAIN_QUICK:
+			continue
+		var g: Dictionary = runs[name]
+		var opts: Dictionary = g.opts
+		var seed := int(opts.seed)
+		var m: Dictionary
+		if opts.map == "chaos":
+			m = Maps.make_chaos(float(seed), gen, Balance.data)
+		else:
+			m = maps[opts.map].duplicate(true)
+		var rnd := Rng.new(seed ^ 0x9e3779b9)
+		var bz := Maps.battle_zones(m, opts, rnd, gen)
+		m.zonesFinal = bz.zonesFinal
+		var diff := _first_diff(Maps._decode(g.zonesFinal), bz.zonesFinal, "zonesFinal")
+		if diff.is_empty():
+			diff = _first_diff(g.slotOf, bz.slotOf, "slotOf")
+		var t0 := Time.get_ticks_msec()
+		var t = Terrain.build(m, seed, Balance.data, gen)
+		var ms := Time.get_ticks_msec() - t0
+		var problems: Array[String] = []
+		if not diff.is_empty():
+			problems.append("start slots " + diff)
+		if _sha(t.hv.to_byte_array()) != g.hv:
+			var first := ""
+			for s: Array in g.samples:
+				if DMath.bits(t.hv[int(s[0])]) != _hex_bits(s[1]):
+					first = " (first sampled difference at vertex %d: web %s, port %s)" % [s[0], DMath._f(_hex_bits(s[1])), t.hv[int(s[0])]]
+					break
+			problems.append("heights differ" + first)
+		if _sha(t.land_grid) != g.pass:
+			problems.append("passability differs (%d land cells, web %d)" % [_count(t.land_grid), g.passCount])
+		if _sha(t.water_grid) != g.wpass:
+			problems.append("water grid differs")
+		var pd := _first_diff(Maps._decode(g.props), t.props, "props")
+		if not pd.is_empty():
+			problems.append(pd)
+		var cd := _first_diff(Maps._decode(g.coves), t.coves, "coves")
+		if not cd.is_empty():
+			problems.append(cd)
+		_ok(problems.is_empty(), "terrain %s identical to web (%dx%d cells, %d props, %d coves, built in %.1f s) %s" % [
+			name, t.GW, t.GH, t.props.size(), t.coves.size(), ms / 1000.0, "; ".join(problems)])
+	return true
+
+
+static func _sha(b: PackedByteArray) -> String:
+	var h := HashingContext.new()
+	h.start(HashingContext.HASH_SHA256)
+	h.update(b)
+	return h.finish().hex_encode()
+
+
+static func _count(b: PackedByteArray) -> int:
+	var n := 0
+	for x in b:
+		n += x
+	return n

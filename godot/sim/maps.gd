@@ -493,3 +493,107 @@ static func _once(seen: Array, o: Dictionary) -> bool:
 			return false
 	seen.append(o)
 	return true
+
+
+# ---------- start slots (web createGame: "assign HQ start slots") ----------
+
+## Picks each army's HQ start and returns {slotOf, zonesFinal, NF, teamOf, mode}.
+## opts: like the web createGame options (humans, ai, mode). rnd: the battle's Rng (Chaos Isles
+## shuffles the starts with it). Unused HQ slots become neutral Fortresses.
+static func battle_zones(m: Dictionary, opts: Dictionary, rnd, gen: Dictionary) -> Dictionary:
+	var far: float = gen.slots.far
+	var worst: float = gen.slots.teamWorst
+	var max_p: int = int(m.maxPlayers)
+	var humans: Array = opts.get("humans", [])
+	if humans.is_empty():
+		humans = [{"team": 1}]
+	humans = humans.slice(0, max_p)
+	var H := humans.size()
+	var ai: Array = opts.get("ai", [{"p": 0, "team": 2}, {"p": 1, "team": 3}, {"p": 2, "team": 4}])
+	ai = ai.slice(0, maxi(0, max_p - H))
+	var NF := ai.size() + H
+	var mode := "teams" if opts.get("mode", "") == "teams" or m.get("carrier", false) else "ffa"
+	var team_of := []
+	for i in H:
+		team_of.append(humans[i].get("team", 1) if mode == "teams" else i)
+	for i in ai.size():
+		team_of.append(ai[i].get("team", 2) if mode == "teams" else H + i)
+	var sp := []
+	for i: Variant in m.slots:
+		sp.append(Vector2(m.zones[int(i)][2], m.zones[int(i)][3]))
+	var dist := func(a: Vector2, b: Vector2) -> float: return DMath.hypot(a.x - b.x, a.y - b.y)
+	var slot_of := []
+	slot_of.resize(NF)
+	slot_of.fill(-1)
+	var used := {}
+	slot_of[0] = 0
+	used[0] = true
+	var order := range(1, NF)
+	if mode == "teams":
+		var teams := []
+		for t: Variant in team_of:
+			if not t in teams:
+				teams.append(t)
+		for t: Variant in teams:
+			var members := order.filter(func(f: int) -> bool: return team_of[f] == t and slot_of[f] < 0)
+			if members.is_empty():
+				continue
+			var anchor := 0 if t == team_of[0] else -1
+			for f: int in members:
+				var best := -1
+				var bs := worst
+				for k in sp.size():
+					if used.has(k):
+						continue
+					var sc: float
+					if anchor >= 0:
+						sc = -dist.call(sp[k], sp[anchor])
+					else:
+						sc = far
+						for g in NF:
+							if slot_of[g] >= 0 and team_of[g] != t:
+								sc = minf(sc, dist.call(sp[k], sp[slot_of[g]]))
+					if sc > bs:
+						bs = sc
+						best = k
+				slot_of[f] = best
+				used[best] = true
+				if anchor < 0:
+					anchor = best
+	else:
+		for f: int in order:
+			var best := -1
+			var bs := -1.0
+			for k in sp.size():
+				if used.has(k):
+					continue
+				var md := far
+				for g in NF:
+					if slot_of[g] >= 0:
+						md = minf(md, dist.call(sp[k], sp[slot_of[g]]))
+				if md > bs:
+					bs = md
+					best = k
+			slot_of[f] = best
+			used[best] = true
+	# Chaos Isles: throw the plan away and shuffle every army onto a random start
+	if m.get("chaos", false):
+		used.clear()
+		var perm := range(sp.size())
+		var i := perm.size() - 1
+		while i > 0:
+			var j := int(floorf(rnd.next() * (i + 1)))
+			var tmp: int = perm[i]
+			perm[i] = perm[j]
+			perm[j] = tmp
+			i -= 1
+		for f in NF:
+			slot_of[f] = perm[f]
+			used[perm[f]] = true
+	var zones_final := []
+	for z: Array in m.zones:
+		zones_final.append(z.duplicate())
+	for k in m.slots.size():
+		if not used.has(k):
+			zones_final[int(m.slots[k])][1] = "fortress"
+	return {"slotOf": slot_of, "zonesFinal": zones_final, "NF": NF, "teamOf": team_of, "mode": mode}
