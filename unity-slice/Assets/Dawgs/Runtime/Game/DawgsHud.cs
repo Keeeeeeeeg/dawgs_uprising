@@ -197,6 +197,7 @@ public class DawgsHud : MonoBehaviour
         var card = E(null, bar, "card");
         cardTabs = E(null, card, "cardTabs");
         cardGrid = E(null, card, "cardGrid");
+        cardGrid.RegisterCallback<GeometryChangedEvent>(_ => FitCardGrid());   // a resized window or panel refits the tiles
         cardHint = L("", null, card); cardHint.name = "cardHint";
         gstrip = E("gstrip", card);
         var ms = E("gs-btn off", gstrip); L("MISSILE", null, ms, F.Display); L("0", "gs-b", ms, F.Mono); L("NO SILO", "gs-b", ms, F.Display); L("Q", "gs-b", ms, F.Mono);
@@ -378,6 +379,7 @@ public class DawgsHud : MonoBehaviour
             if (own) Btn(L("ORDERS", mode == "orders" ? "tab on" : "tab", cardTabs, F.Display), _ => { cardMode = "orders"; cardForced = true; });
             Btn(L("RECRUIT", mode == "recruit" ? "tab on" : "tab", cardTabs, F.Display), _ => { cardMode = "recruit"; cardForced = own; });
             if (mode == "orders") BuildOrders(); else BuildRecruit(dz);
+            cardGrid.schedule.Execute(FitCardGrid);                          // once the new tiles have been laid out
         }
         // live state
         foreach (var (ic, btn, on) in orderBtns) { bool o = on(); btn.EnableInClassList("on", o); ic.SetColor(o ? Ink : Militia); }
@@ -388,6 +390,58 @@ public class DawgsHud : MonoBehaviour
             cardHint.text = cmd.armed == DawgsCommand.Armed.Fight ? "Fight-move: click where to go. Units stop for anything they meet on the way."
                 : cmd.armed == DawgsCommand.Armed.Guard ? "Guard: click one of your units. The selection follows it and fights off whatever threatens it."
                 : $"Stance applies to {n} ground unit{(n == 1 ? "" : "s")}. Right-click to move or attack.";
+        }
+    }
+
+    // ---------------------------------------------------------------- tiles that fill the card
+    // like the browser's fitCardGrid: when the card has room to spare (a few units or orders on a wide screen) its tiles
+    // grow to fill it, pictures, icons and text with them; with many tiles they keep their usual size
+    const float CbGap = 4f, CbMaxH = 230f, CbMinAspect = 0.95f, CbMaxAspect = 2.3f;
+    static readonly Dictionary<string, float> CbFont = new Dictionary<string, float>
+    { { "rt-n", 9.5f }, { "rt-k", 10.5f }, { "rt-c", 10f }, { "rt-q", 11f }, { "cb-n", 13f }, { "cb-k", 9.5f } };
+
+    void FitCardGrid()
+    {
+        var g = cardGrid; if (g == null || g.panel == null) return;
+        var tiles = g.Children().Where(e => e.ClassListContains("rt") || e.ClassListContains("cb")).ToList();
+        foreach (var t in tiles) SizeTile(t, -1f, -1f, 1f, 1f);
+        float W = g.contentRect.width, H = g.contentRect.height;
+        if (tiles.Count == 0 || float.IsNaN(W) || float.IsNaN(H) || W < 60f || H < 40f) return;
+        bool rt = tiles[0].ClassListContains("rt");
+        float bw = 104f, bh = rt ? 66f : 70f;
+        float fixedH = 0f;
+        foreach (var e in g.Children()) if (!tiles.Contains(e)) fixedH += e.layout.height + e.resolvedStyle.marginTop + e.resolvedStyle.marginBottom;
+        int n = tiles.Count; float Ha = H - fixedH, bestW = 0f, bestH = 0f, bestA = 0f;
+        for (int cols = 1; cols <= n; cols++)
+        {
+            int rows = Mathf.CeilToInt(n / (float)cols);
+            float colW = (W - cols * CbGap) / cols - 0.5f; if (colW < bw) break;
+            float h = Mathf.Min((Ha - rows * CbGap) / rows, colW / CbMinAspect, CbMaxH); if (h < bh) continue;
+            float w = Mathf.Min(colW, h * (rt ? 1.9f : CbMaxAspect)), a = w * h;   // unit pictures fill their tile, so don't let it get too wide
+            if (a > bestA + 1f) { bestA = a; bestW = w; bestH = h; }
+        }
+        if (bestA <= 0f || (bestH < bh * 1.08f && bestW < bw * 1.25f)) return;
+        float k = Mathf.Min(2.6f, bestH / bh), f = 1f + (k - 1f) * 0.45f;
+        foreach (var t in tiles) SizeTile(t, Mathf.Floor(bestW), Mathf.Floor(bestH), k, f);
+    }
+
+    /// w < 0: back to the stylesheet's size
+    static void SizeTile(VisualElement t, float w, float h, float k, float f)
+    {
+        t.style.width = w < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(w);
+        t.style.height = h < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(h);
+        foreach (var c in t.Children())
+        {
+            if (c is DawgsIcon)
+            {
+                c.style.width = w < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(30f * k);
+                c.style.height = w < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(20f * k);
+                c.MarkDirtyRepaint();
+                continue;
+            }
+            foreach (var kv in CbFont)
+                if (c.ClassListContains(kv.Key)) { c.style.fontSize = w < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(kv.Value * f); break; }
+            if (c.ClassListContains("rt-pb")) c.style.height = w < 0f ? new StyleLength(StyleKeyword.Null) : new StyleLength(4f * f);
         }
     }
 

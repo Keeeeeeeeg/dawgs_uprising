@@ -57,16 +57,7 @@ public static class DawgsPlayBuilder
 
         // thumbnails and the minimap picture, before the game objects exist
         bool fog = RenderSettings.fog; RenderSettings.fog = false;
-        var thumbs = new List<DawgsGame.Thumb>();
-        var types = new HashSet<string>(DawgsGame.RecruitGroups.SelectMany(g => g.Skip(1)));
-        foreach (var t in new[] { "rifle", "mg", "at", "sniper", "rover" }) types.Add(t);
-        foreach (var t in types)
-        {
-            if (!prefabs.TryGetValue($"u_{t}_0", out var pf)) continue;
-            string tp = $"{Gen}/Thumbs/{t}.png";
-            File.WriteAllBytes(Abs(tp), RenderThumb(pf, 208, 132).EncodeToPNG());
-            thumbs.Add(new DawgsGame.Thumb { key = t, tex = null });
-        }
+        var thumbs = RenderThumbs(prefabs);
         string mp = Gen + "/minimap.png";
         File.WriteAllBytes(Abs(mp), RenderMinimap(1032, 384).EncodeToPNG());
         RenderSettings.fog = fog;
@@ -140,6 +131,45 @@ public static class DawgsPlayBuilder
         c.clearFlags = CameraClearFlags.SolidColor; c.allowHDR = false; c.allowMSAA = true;
         var ucd = c.GetUniversalAdditionalCameraData(); ucd.renderPostProcessing = false; ucd.renderShadows = false; ucd.antialiasing = AntialiasingMode.None;
         return c;
+    }
+
+    // every recruitable unit's picture for the HUD, twice the tile's usual size so it stays sharp on the bigger tiles a
+    // roomy command card gets (Generated/Thumbs/<type>.png)
+    static List<DawgsGame.Thumb> RenderThumbs(Dictionary<string, GameObject> prefabs)
+    {
+        var thumbs = new List<DawgsGame.Thumb>();
+        var types = new HashSet<string>(DawgsGame.RecruitGroups.SelectMany(g => g.Skip(1)));
+        foreach (var t in new[] { "rifle", "mg", "at", "sniper", "rover" }) types.Add(t);
+        foreach (var t in types)
+        {
+            if (!prefabs.TryGetValue($"u_{t}_0", out var pf)) continue;
+            string tp = $"{Gen}/Thumbs/{t}.png";
+            File.WriteAllBytes(Abs(tp), RenderThumb(pf, 416, 264).EncodeToPNG());
+            thumbs.Add(new DawgsGame.Thumb { key = t, tex = null });
+        }
+        return thumbs;
+    }
+
+    /// re-renders the unit pictures in place (same files, so the skirmish scene keeps pointing at them), without
+    /// rebuilding the scene
+    [MenuItem("Dawgs/Rebuild Unit Thumbnails")]
+    public static void ThumbsMenu() { if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) Debug.Log("[Dawgs] " + RebuildThumbnails()); }
+
+    public static string RebuildThumbnails()
+    {
+        string back = EditorSceneManager.GetActiveScene().path;
+        Dir(Gen + "/Thumbs");
+        EditorSceneManager.OpenScene(SlicePath, OpenSceneMode.Single);
+        var rep = Object.FindFirstObjectByType<DawgsReplay>();
+        var prefabs = new Dictionary<string, GameObject>();
+        if (rep) foreach (var u in rep.unitPrefabs) if (u.prefab) prefabs[u.key] = u.prefab;
+        bool fog = RenderSettings.fog; RenderSettings.fog = false;
+        var thumbs = RenderThumbs(prefabs);
+        RenderSettings.fog = fog;
+        AssetDatabase.Refresh();
+        foreach (var th in thumbs) UiTexture($"{Gen}/Thumbs/{th.key}.png");
+        if (!string.IsNullOrEmpty(back) && back != SlicePath) EditorSceneManager.OpenScene(back, OpenSceneMode.Single);
+        return $"thumbnails {thumbs.Count} at 416x264";
     }
 
     // the model from the front right, over the game's thumbnail backdrop (radial #4a6278 -> #24313c -> #141b21)
