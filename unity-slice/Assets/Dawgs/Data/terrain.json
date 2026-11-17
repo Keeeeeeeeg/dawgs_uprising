@@ -1,0 +1,152 @@
+{
+ "x0": -645.0,
+ "z0": -240.0,
+ "width": 1290.0,
+ "depth": 480.0,
+ "hmin": -5.5,
+ "hmax": 5.927,
+ "res": 1025,
+ "alphaRes": 1024,
+ "water": 0.05,
+ "layers": [
+  {
+   "name": "grass",
+   "tint": [
+    1.1396242388305695,
+    0.9971908398044272,
+    1.0103832715284629
+   ],
+   "tile": 11
+  },
+  {
+   "name": "sand",
+   "tint": [
+    0.8203117103698008,
+    0.867373924656652,
+    0.8774723348521984
+   ],
+   "tile": 9
+  },
+  {
+   "name": "rock",
+   "tint": [
+    0.9402812830101099,
+    0.9674247804267705,
+    0.7262882402055036
+   ],
+   "tile": 9
+  },
+  {
+   "name": "soil",
+   "tint": [
+    0.9407774667700379,
+    1.0249203248689216,
+    0.9476233219072855
+   ],
+   "tile": 11
+  }
+ ],
+ "lights": [
+  {
+   "type": "hemi",
+   "sky": "c9d4dc",
+   "ground": "2e271e",
+   "intensity": 0.62
+  },
+  {
+   "type": "dir",
+   "color": "ffdcb4",
+   "intensity": 1.18,
+   "dir": [
+    259.1454193566948,
+    -388.7181290350421,
+    -178.16247580772765
+   ]
+  }
+ ],
+ "fog": {
+  "color": "476268",
+  "near": 320,
+  "far": 780
+ },
+ "bg": "1b4a5c",
+ "cam": {
+  "x": -443,
+  "z": -14,
+  "d": 110,
+  "yaw": 0,
+  "pitch": 0.98
+ },
+ "zones": [
+  {
+   "name": "Test HQ",
+   "type": "hq",
+   "x": -465,
+   "z": 0,
+   "r": 18,
+   "owner": 0,
+   "mega": false,
+   "gate": 1.0472
+  },
+  {
+   "name": "Test Fortress",
+   "type": "fortress",
+   "x": -300,
+   "z": -45,
+   "r": 21,
+   "owner": 0,
+   "mega": false,
+   "gate": 0
+  },
+  {
+   "name": "Test Port Fortress",
+   "type": "fortress",
+   "x": -165,
+   "z": 90,
+   "r": 21,
+   "owner": 0,
+   "mega": false,
+   "gate": 0.5236
+  },
+  {
+   "name": "Test Town",
+   "type": "town",
+   "x": -15,
+   "z": -52.5,
+   "r": 18.9,
+   "owner": 0,
+   "mega": true,
+   "gate": 0.8726666666666667
+  },
+  {
+   "name": "Test Port",
+   "type": "town",
+   "x": 120,
+   "z": 72,
+   "r": 10,
+   "owner": 0,
+   "mega": false,
+   "gate": 5.410533333333333
+  },
+  {
+   "name": "Test Airbase",
+   "type": "airbase",
+   "x": 285,
+   "z": -30,
+   "r": 13,
+   "owner": 0,
+   "mega": false,
+   "gate": -2.61798898038469
+  },
+  {
+   "name": "Idle HQ",
+   "type": "hq",
+   "x": 567,
+   "z": 0,
+   "r": 18,
+   "owner": 1,
+   "mega": false,
+   "gate": 2.618
+  }
+ ]
+}

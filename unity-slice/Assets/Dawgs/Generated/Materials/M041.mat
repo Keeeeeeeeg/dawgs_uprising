@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M041
+  m_Shader: {fileID: 4800000, guid: 049f76922eca893469c683fd29c30b5b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2000
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 6d625f545ad7ee44d80e6ed41ab4571e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMap:
+        m_Texture: {fileID: 2800000, guid: 0ae919669dafa8a4c80584c61b799448, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormal:
+        m_Texture: {fileID: 2800000, guid: 3e427eaf5cd213745b00f1086b1c4512, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GroundHeight:
+        m_Texture: {fileID: 2800000, guid: 63da10186638f73458116314888f5034, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RoofMap:
+        m_Texture: {fileID: 2800000, guid: 03ac40e886f7b68499f2449836811013, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RoofNormal:
+        m_Texture: {fileID: 2800000, guid: 38f9977cf4ea2a4439f5bdc553927cba, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TopMap:
+        m_Texture: {fileID: 2800000, guid: c3a38346e1b248840b93e1bb6b3c58c1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TopNormal:
+        m_Texture: {fileID: 2800000, guid: 975036ee521740e4489ac18bf042a8eb, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Cull: 2
+    - _Cutoff: 0
+    - _DetailMacro: 0.68
+    - _DetailNormalStrength: 0.42000002
+    - _DetailScale: 8
+    - _DetailStrength: 0.6
+    - _DstBlend: 0
+    - _GlassFromAlpha: 0
+    - _GlassSmoothness: 0.86
+    - _Grime: 0.5
+    - _Metallic: 0
+    - _RoofAbove: 2.2
+    - _RoofScale: 6
+    - _Smoothness: 0.12
+    - _SrcBlend: 1
+    - _TopNormalStrength: 0.71999997
+    - _TopScale: 5
+    - _TopStrength: 0.9
+    - _VertexColor: 0
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _DetailMean: {r: 0.7353588, g: 0.73536265, b: 0.7353622, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _GroundRange: {r: -5.5, g: 11.427, b: 0, a: 0}
+    - _GroundRect: {r: -645, g: -240, b: 0.0007751938, a: 0.0020833334}
+    - _RoofMean: {r: 0.73535997, g: 0.73535734, b: 0.73536134, a: 1}
+    - _TopMean: {r: 0.7353903, g: 0.7353885, b: 0.7353879, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

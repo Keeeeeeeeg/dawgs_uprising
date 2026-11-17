@@ -1,0 +1,1228 @@
+/* Dawgs Uprising -> Unity: the browser game's battle HUD (chamfered instrument panels on the edges of a full-bleed
+   battlefield), ported from its CSS. Panel shapes are drawn by DawgsPanel (Painter2D); fonts are set from C#. */
+:root {
+    --ink: #12150e;
+    --panel-hi: rgba(30, 35, 23, 0.95);
+    --line: #38422c;
+    --line-hi: #56643f;
+    --text: #ece6d2;
+    --dim: #a39c84;
+    --faint: #6b6754;
+    --militia: #7cc94f;
+    --good: #9be06a;
+    --bad: #ff5a40;
+    --warn: #ffd25a;
+}
+
+.hud-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.caps {
+    letter-spacing: 1.5px;
+}
+
+/* ---------- top bar ---------- */
+#top {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    flex-direction: row;
+}
+
+.cell {
+    justify-content: center;
+    padding: 7px 14px;
+    border-right-width: 1px;
+    border-right-color: var(--line);
+}
+
+.cell-last {
+    border-right-width: 0;
+}
+
+.brand {
+    font-size: 15px;
+    -unity-font-style: bold;
+    letter-spacing: 1.2px;
+    color: var(--militia);
+}
+
+.brand-small {
+    font-size: 9.5px;
+    letter-spacing: 1.9px;
+    color: var(--dim);
+    -unity-font-style: bold;
+    margin-top: 2px;
+}
+
+.cell-head {
+    font-size: 10.5px;
+    letter-spacing: 1.6px;
+    color: var(--dim);
+    margin-bottom: 2px;
+}
+
+.stat-row {
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.stat {
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.stat-em {
+    font-size: 11px;
+    color: var(--good);
+    margin-left: 4px;
+    margin-bottom: 1px;
+}
+
+.stat-dim {
+    font-size: 12px;
+    color: var(--dim);
+    margin-left: 4px;
+    margin-bottom: 1px;
+}
+
+.btn-outline {
+    flex-direction: row;
+    align-items: center;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    padding: 5px 10px;
+}
+
+.btn-outline:hover {
+    border-color: var(--militia);
+}
+
+.btn-label {
+    font-size: 12px;
+    letter-spacing: 1.4px;
+}
+
+.kbd {
+    font-size: 10px;
+    color: var(--militia);
+    margin-left: 6px;
+}
+
+.ctl-row {
+    flex-direction: row;
+}
+
+.ctl-btn {
+    font-size: 11px;
+    padding: 3px 7px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    color: var(--dim);
+    margin-right: 3px;
+    -unity-text-align: middle-center;
+}
+
+.ctl-btn:hover {
+    border-color: var(--militia);
+}
+
+.ctl-btn.on {
+    color: var(--ink);
+    background-color: var(--militia);
+    border-color: var(--militia);
+}
+
+/* ---------- right column: armies ---------- */
+#right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 270px;
+    padding: 4px 8px 6px 8px;
+}
+
+.panel-head {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 2px 5px 2px;
+}
+
+.panel-title {
+    font-size: 11px;
+    letter-spacing: 1.7px;
+    color: var(--dim);
+}
+
+.fold {
+    font-size: 10px;
+    color: var(--dim);
+}
+
+.fac {
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 2px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+}
+
+.fac-first {
+    border-top-width: 0;
+}
+
+.fac-sw {
+    width: 30px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.fac-main {
+    flex-grow: 1;
+}
+
+.fac-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fac-nm {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 0.5px;
+}
+
+.fac-ct {
+    font-size: 11px;
+    color: var(--dim);
+}
+
+.fac-sub {
+    font-size: 11px;
+    color: var(--dim);
+}
+
+.fac-vs {
+    font-size: 11px;
+    color: var(--good);
+}
+
+.fac.dead {
+    opacity: 0.4;
+}
+
+/* ---------- messages ---------- */
+#log {
+    position: absolute;
+    left: 10px;
+    bottom: 280px;
+    width: 300px;
+    padding: 6px 10px 8px 10px;
+}
+
+.log-line {
+    flex-direction: row;
+    margin-top: 3px;
+}
+
+.log-t {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    color: var(--faint);
+    margin-right: 7px;
+    padding-top: 1px;
+}
+
+.log-x {
+    font-size: 12.5px;
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.log-alert {
+    color: #ffffff;
+}
+
+/* ---------- bottom command bar: minimap | selection | command card ---------- */
+#cmd {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    height: 262px;
+    flex-direction: row;
+}
+
+#mapBox {
+    padding: 8px;
+    border-right-width: 1px;
+    border-right-color: var(--line);
+}
+
+.map-btns {
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+
+.tool-btn {
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    padding: 2px 8px;
+    border-width: 1px;
+    margin-right: 12px;
+}
+
+.tool-ping {
+    color: var(--warn);
+    border-color: #7a6a2e;
+}
+
+.tool-draw {
+    color: #8fd0ff;
+    border-color: #3d6a86;
+}
+
+.tool-erase {
+    color: #ff8a6a;
+    border-color: #7a3a2e;
+}
+
+.tool-btn.on {
+    background-color: rgba(255, 210, 90, 0.18);
+}
+
+.tool-btn.off {
+    opacity: 0.4;
+}
+
+.mini-wrap {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+#mini {
+    overflow: hidden;
+    width: 290px;
+    height: 108px;
+    border-width: 1px;
+    border-color: var(--line);
+    background-color: #1d4b5c;
+}
+
+#selBox {
+    width: 300px;
+    padding: 8px 12px;
+    border-right-width: 1px;
+    border-right-color: var(--line);
+    overflow: hidden;
+}
+
+.sel-head {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.sel-b {
+    font-size: 15px;
+    color: var(--militia);
+    -unity-font-style: bold;
+    margin-right: 8px;
+}
+
+.sel-dim {
+    font-size: 12.5px;
+    color: var(--dim);
+}
+
+.sel-txt {
+    font-size: 12.5px;
+}
+
+.hint {
+    font-size: 12.5px;
+    color: var(--dim);
+    white-space: normal;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.tip-row {
+    flex-direction: row;
+    margin-bottom: 3px;
+}
+
+.tip-k {
+    width: 92px;
+    font-size: 10.5px;
+    color: var(--militia);
+    padding-top: 2px;
+}
+
+.tip-v {
+    flex-shrink: 1;
+    font-size: 12px;
+    color: var(--dim);
+    white-space: normal;
+}
+
+.tiles {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.utile {
+    width: 92px;
+    height: 58px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border-width: 1px;
+    border-color: #4e6476;
+    background-color: #24313c;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.utile:hover {
+    border-color: var(--militia);
+}
+
+.utile-n {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    max-width: 86%;
+    font-size: 9.5px;
+    color: #e8eef2;
+    -unity-text-align: upper-right;
+    white-space: normal;
+    text-shadow: 0 1px 2px #000000;
+}
+
+.utile-c {
+    position: absolute;
+    left: 4px;
+    bottom: 5px;
+    font-size: 12px;
+    color: #ffffff;
+    -unity-font-style: bold;
+    text-shadow: 0 1px 2px #000000;
+}
+
+.utile-hp {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+.utile-hpf {
+    height: 100%;
+    background-color: var(--militia);
+}
+
+.uc-name {
+    font-size: 18px;
+    -unity-font-style: bold;
+    letter-spacing: 0.6px;
+}
+
+.uc-cls {
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: var(--dim);
+    margin-bottom: 6px;
+}
+
+.uc-hp {
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-width: 1px;
+    border-color: var(--line-hi);
+    margin-bottom: 8px;
+}
+
+.uc-hpf {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #4f8a33;
+}
+
+.uc-hpt {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+}
+
+.sx-row {
+    flex-direction: row;
+}
+
+.sx {
+    flex-grow: 1;
+    align-items: center;
+    padding: 5px 2px 4px 2px;
+    margin-right: 4px;
+    border-width: 1px;
+    border-color: var(--line);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.sx-b {
+    font-size: 19px;
+    -unity-font-style: bold;
+}
+
+.sx-s {
+    font-size: 9.5px;
+    letter-spacing: 0.6px;
+    color: var(--dim);
+    margin-top: 2px;
+}
+
+/* ---------- command card ---------- */
+#card {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 6px 10px 8px 10px;
+}
+
+#cardTabs {
+    flex-direction: row;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--line);
+    align-items: flex-end;
+}
+
+.tab {
+    font-size: 10.5px;
+    letter-spacing: 1.4px;
+    padding: 4px 10px 5px 10px;
+    color: var(--dim);
+    border-bottom-width: 2px;
+    border-bottom-color: rgba(0, 0, 0, 0);
+    margin-bottom: -1px;
+}
+
+.tab:hover {
+    color: var(--text);
+}
+
+.tab.on {
+    color: var(--text);
+    border-bottom-color: var(--militia);
+}
+
+.card-top {
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    padding-bottom: 3px;
+}
+
+.card-top-l {
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: var(--dim);
+    margin-right: 6px;
+}
+
+.card-top-b {
+    font-size: 13px;
+    -unity-font-style: bold;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.arrow-btn {
+    font-size: 11px;
+    padding: 1px 7px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+}
+
+.arrow-btn:hover {
+    border-color: var(--militia);
+}
+
+#cardGrid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    margin-top: 5px;
+    align-content: flex-start;
+    overflow: hidden;
+}
+
+.cb {
+    width: 104px;
+    height: 70px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    background-color: var(--panel-hi);
+    align-items: center;
+    justify-content: center;
+}
+
+.cb:hover {
+    border-color: var(--militia);
+}
+
+.cb.on {
+    background-color: var(--militia);
+    border-color: var(--militia);
+}
+
+.cb.off {
+    opacity: 0.38;
+}
+
+.cb-ic {
+    width: 30px;
+    height: 20px;
+}
+
+.cb-n {
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    margin-top: 4px;
+}
+
+.cb.on > .cb-n {
+    color: var(--ink);
+}
+
+.cb-k {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 9.5px;
+    color: var(--militia);
+}
+
+.cb.on > .cb-k {
+    color: var(--ink);
+}
+
+.cgsub {
+    width: 100%;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+    color: #9a9584;
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    padding: 2px 2px 3px 2px;
+    margin-bottom: 4px;
+}
+
+.fac-tabs {
+    width: 100%;
+    flex-direction: row;
+    margin-bottom: 5px;
+}
+
+.fac-tab {
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 9px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    color: var(--dim);
+    font-size: 11px;
+    letter-spacing: 1.3px;
+    margin-right: 4px;
+}
+
+.fac-tab:hover {
+    border-color: var(--militia);
+}
+
+.fac-tab.on {
+    color: var(--ink);
+    background-color: var(--militia);
+    border-color: var(--militia);
+}
+
+.fac-tab-n {
+    font-size: 10.5px;
+    letter-spacing: 0;
+    margin-left: 6px;
+    opacity: 0.75;
+}
+
+.rt {
+    width: 104px;
+    height: 66px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border-width: 1px;
+    border-color: #4e6476;
+    background-color: #24313c;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.rt:hover {
+    border-color: var(--militia);
+}
+
+.rt.off {
+    opacity: 0.55;
+}
+
+.rt-n {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    max-width: 72%;
+    font-size: 9.5px;
+    color: #e8eef2;
+    -unity-text-align: upper-right;
+    white-space: normal;
+    text-shadow: 0 1px 2px #000000;
+}
+
+.rt-k {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 10.5px;
+    -unity-font-style: bold;
+    color: #bff08f;
+    text-shadow: 0 1px 2px #000000;
+}
+
+.rt-c {
+    position: absolute;
+    left: 4px;
+    bottom: 5px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: #ffffff;
+    text-shadow: 0 1px 2px #000000;
+}
+
+.rt-q {
+    position: absolute;
+    right: 4px;
+    bottom: 5px;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: var(--warn);
+    text-shadow: 0 1px 2px #000000;
+}
+
+.rt-pb {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    background-color: var(--warn);
+}
+
+#cardHint {
+    flex-shrink: 0;
+    font-size: 11.5px;
+    color: var(--dim);
+    white-space: normal;
+    margin-top: 2px;
+    min-height: 15px;
+}
+
+.gstrip {
+    flex-shrink: 0;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+    padding-top: 5px;
+}
+
+.gs-btn {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    padding: 3px 6px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    margin-right: 6px;
+    flex-direction: row;
+}
+
+.gs-btn:hover {
+    border-color: var(--militia);
+}
+
+.gs-btn.off {
+    opacity: 0.35;
+}
+
+.gs-b {
+    font-size: 10px;
+    color: var(--dim);
+    margin-left: 4px;
+}
+
+.gs-chk {
+    width: 12px;
+    height: 12px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    margin-right: 4px;
+}
+
+.gs-auto {
+    flex-direction: row;
+    align-items: center;
+    margin-right: 6px;
+    opacity: 0.5;
+}
+
+/* ---------- toast ---------- */
+#toast {
+    position: absolute;
+    top: 76px;
+    left: 50%;
+    translate: -50% 0;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    padding: 7px 14px;
+    background-color: rgba(22, 26, 17, 0.92);
+    border-width: 1px;
+    border-color: var(--line-hi);
+    opacity: 0;
+    transition-duration: 0.2s;
+}
+
+#toast.on {
+    opacity: 1;
+}
+
+#toast.bad {
+    background-color: rgba(40, 12, 10, 0.92);
+    border-color: var(--bad);
+    color: #ffd9d4;
+}
+
+/* ---------- world overlays ---------- */
+.hp {
+    position: absolute;
+    height: 5px;
+    background-color: rgba(10, 12, 8, 0.85);
+    border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.7);
+}
+
+.hp-f {
+    height: 100%;
+}
+
+.zl {
+    position: absolute;
+    align-items: center;
+    translate: -50% -100%;
+}
+
+.zl-k {
+    font-size: 10px;
+    letter-spacing: 1.3px;
+    background-color: rgba(18, 22, 14, 0.85);
+    padding: 1px 6px;
+}
+
+.zl-n {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(18, 22, 14, 0.9);
+    border-width: 1px;
+    padding: 2px 7px;
+}
+
+.zl-nt {
+    font-size: 13px;
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+}
+
+.zl-sq {
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+}
+
+.zl-cap {
+    width: 100%;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.zl-capf {
+    height: 100%;
+}
+
+.zl-sub {
+    font-size: 10px;
+    letter-spacing: 1px;
+    background-color: rgba(18, 22, 14, 0.85);
+    padding: 1px 6px;
+    color: var(--dim);
+}
+
+#selRect {
+    position: absolute;
+    border-width: 1px;
+    border-color: var(--militia);
+    background-color: rgba(124, 201, 79, 0.12);
+}
+
+/* ---------- menus ---------- */
+.modal-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 13, 9, 0.78);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    width: 440px;
+    padding: 18px 20px 14px 20px;
+}
+
+.modal-kick {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--dim);
+}
+
+.modal-title {
+    font-size: 28px;
+    letter-spacing: 1.6px;
+    -unity-font-style: bold;
+    margin-top: 2px;
+}
+
+.modal-sub {
+    color: var(--dim);
+    font-size: 13px;
+    margin-top: 4px;
+    margin-bottom: 14px;
+    white-space: normal;
+}
+
+.mbtn {
+    font-size: 13px;
+    letter-spacing: 1.3px;
+    padding: 9px 12px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    margin-bottom: 6px;
+}
+
+.mbtn:hover {
+    border-color: var(--militia);
+    background-color: rgba(124, 201, 79, 0.12);
+}
+
+.mbtn-main {
+    background-color: var(--militia);
+    color: var(--ink);
+    border-color: var(--militia);
+}
+
+.mbtn-main:hover {
+    background-color: #8fd862;
+}
+
+.keys {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+}
+
+/* ---------- sound settings (pause screen) ---------- */
+.volrow {
+    margin-top: 10px;
+    margin-bottom: 12px;
+    padding-top: 10px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+}
+
+.modal-sec {
+    font-size: 12px;
+    letter-spacing: 1.4px;
+    color: var(--dim);
+    margin-bottom: 8px;
+}
+
+.set-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.set-left {
+    flex-direction: row;
+    align-items: flex-end;
+    flex-shrink: 1;
+}
+
+.set-name {
+    font-size: 13px;
+}
+
+.set-small {
+    font-size: 11px;
+    color: var(--dim);
+    margin-left: 6px;
+    margin-bottom: 1px;
+}
+
+.set-out {
+    font-size: 12px;
+    color: var(--militia);
+}
+
+.vol-slider {
+    height: 18px;
+    justify-content: center;
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+.vol-track {
+    height: 4px;
+    background-color: var(--line-hi);
+}
+
+.vol-fill {
+    height: 100%;
+    background-color: var(--militia);
+}
+
+.vol-knob {
+    position: absolute;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    translate: -50% 0;
+    background-color: var(--militia);
+    border-width: 2px;
+    border-color: var(--ink);
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.vol-slider:hover > .vol-knob {
+    background-color: #8fd862;
+}
+
+.tog {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tog-box {
+    width: 13px;
+    height: 13px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    margin-right: 7px;
+}
+
+.tog-box.on {
+    background-color: var(--militia);
+    border-color: var(--militia);
+}
+
+.tog-l {
+    font-size: 12.5px;
+}
+
+/* Interface settings: the browser's segmented control (.seg) for "Middle mouse drag" */
+.seg {
+    flex-direction: row;
+    margin-top: 6px;
+    margin-bottom: 2px;
+}
+
+.seg-btn {
+    flex-grow: 1;
+    flex-basis: 0;
+    padding: 8px 10px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    font-size: 12px;
+    letter-spacing: 0.7px;
+    -unity-text-align: middle-center;
+    color: var(--text);
+}
+
+.seg-btn-r {
+    border-left-width: 0;
+}
+
+.seg-btn:hover {
+    border-color: var(--militia);
+}
+
+.seg-btn.on {
+    background-color: var(--militia);
+    border-color: var(--militia);
+    color: var(--ink);
+}
+
+/* ---------- scoreboard (Tab) and full-screen map (M): overlays that leave the battle running ---------- */
+.overlay-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 13, 9, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+
+.score {
+    width: 860px;
+    padding: 18px 22px 14px 22px;
+}
+
+.bigmap {
+    padding: 16px 18px 18px 18px;
+}
+
+#bigMini {
+    overflow: hidden;
+    width: 1290px;
+    height: 480px;
+    border-width: 1px;
+    border-color: var(--line-hi);
+    background-color: #1d4b5c;
+}
+
+.ov-head {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--line);
+}
+
+.ov-title {
+    font-size: 26px;
+    letter-spacing: 1.2px;
+    -unity-font-style: bold;
+    color: var(--text);
+}
+
+.ov-stats {
+    font-size: 12.5px;
+    color: var(--dim);
+}
+
+.ov-foot {
+    margin-top: 12px;
+    font-size: 11.5px;
+    color: var(--faint);
+}
+
+.sc-team {
+    margin-top: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    letter-spacing: 1.6px;
+    color: var(--dim);
+}
+
+.sc-me {
+    color: var(--militia);
+}
+
+.sc-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 7px 8px;
+    border-top-width: 1px;
+    border-top-color: var(--line);
+}
+
+.sc-row.dead {
+    opacity: 0.45;
+}
+
+.sc-hd {
+    border-top-width: 0;
+    padding-top: 2px;
+    padding-bottom: 4px;
+}
+
+.sc-c {
+    width: 92px;
+    font-size: 13px;
+    color: var(--text);
+    -unity-text-align: middle-right;
+}
+
+.sc-hd .sc-c {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--dim);
+}
+
+.sc-name {
+    flex-grow: 1;
+    width: auto;
+    -unity-text-align: middle-left;
+}
+
+.sc-flag {
+    width: 22px;
+    height: 15px;
+    margin-right: 9px;
+}
+
+.sc-army {
+    font-size: 16px;
+    letter-spacing: 0.6px;
+}

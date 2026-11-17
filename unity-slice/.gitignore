@@ -1,0 +1,46 @@
+# Dawgs Uprising: Unity port. Unity rebuilds these on open, or they're per-user: never commit them.
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# screenshots and build jobs from Claude's testing
+/DawgsShots/
+/DawgsJobs/
+
+# IDE / solution files (Unity regenerates them)
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.unityproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# build and crash leftovers
+sysinfo.txt
+crashlytics-buildid.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Blender backups, Python caches
+*.blend1
+*.blend2
+__pycache__/
