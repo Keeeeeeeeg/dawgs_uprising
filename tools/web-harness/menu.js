@@ -1,0 +1,12 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/hm.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1200,height:700}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));p.on('console',m=>{if(m.type()==='warning'||m.type()==='error')errs.push('console: '+m.text().slice(0,200));});
+await p.goto('file:///tmp/ct/hm.html');await p.waitForTimeout(9000);await p.screenshot({path:'/tmp/ct/m_menu.png'});
+await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.screenshot({path:'/tmp/ct/m_setup.png'});
+await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam,null,{timeout:120000}).catch(()=>{});await p.waitForTimeout(6000);
+await p.screenshot({path:'/tmp/ct/m_game.png'});
+console.log('errs',errs.slice(0,8));await b.close();})();

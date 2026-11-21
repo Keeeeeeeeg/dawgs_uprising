@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file://'+require('path').resolve(process.argv[2]));await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForTimeout(2500);
+await p.click('#planGo').catch(()=>{});await p.waitForTimeout(800);
+for(const k of ['rifle','rifle','mg','at'])await p.evaluate(k=>document.querySelector(`[data-rec="${k}"]`).click(),k);
+await p.waitForTimeout(1500);await p.screenshot({path:'rq.png',clip:{x:700,y:440,width:580,height:320}});
+const m0=await p.$eval('body',()=>0);await p.evaluate(()=>{const l=document.querySelectorAll('.rqc');l[l.length-1].click();});await p.waitForTimeout(700);
+console.log(await p.$$eval('.rqc',l=>l.length));console.log(errs.slice(0,3));await b.close();})();

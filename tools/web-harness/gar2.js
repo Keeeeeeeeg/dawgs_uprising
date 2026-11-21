@@ -1,0 +1,15 @@
+const SIM=require('./load.js')(process.argv[2]);
+const G=SIM.createGame({map:'dawgs',mode:'ffa',ai:[{p:0},{p:1},{p:2}],seed:4});
+const z=G.zones[G.homes[0]];const made=()=>G.units.filter(u=>u.alive&&u.zoneMade===z.id).map(u=>u.type);
+console.log('cap',G.garrisonCap(z),'pool',G.garrisonPool(z).join(','),'garrison',made().join(','));
+G.factions[0].money=5000;
+const s=z.spots.find(s=>!s.used&&!G.canPlace(0,z.id,'motorpool',s.x,s.z));const rv=G.units.find(u=>u.f===0&&u.def.builder);
+console.log('place motorpool',JSON.stringify(G.applyCmd(0,{k:'place',zid:z.id,type:'motorpool',x:s.x,z:s.z,ang:0,ids:[rv.id]})));
+console.log('drill',JSON.stringify(G.applyCmd(0,{k:'drill',zid:z.id})));
+for(let t=0;t<900;t++)G.update(.1);
+console.log('after drill II: cap',G.garrisonCap(z),'pool',G.garrisonPool(z).join(','));
+for(const u of G.units)if(u.alive&&u.zoneMade===z.id&&u.type==='rifle')u.alive=false;
+for(let t=0;t<2400;t++)G.update(.1);
+console.log('garrison now',made().join(','));
+console.log('rover HQ',JSON.stringify(G.roverSlots(z)),'recruit 2nd',JSON.stringify(G.applyCmd(0,{k:'recruit',type:'rover',zid:z.id})),'3rd',JSON.stringify(G.applyCmd(0,{k:'recruit',type:'rover',zid:z.id})).slice(0,90));
+const ab=G.zones.find(q=>q.type==='airbase');console.log('airbase pool',G.garrisonPool(ab).join(','));

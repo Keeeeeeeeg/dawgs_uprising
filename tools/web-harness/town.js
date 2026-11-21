@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+if(!h.includes('window.__cam'))throw new Error('hook');
+const out=process.argv[3];fs.writeFileSync('/tmp/ct/c.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});p.setDefaultTimeout(120000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/ct/c.html');await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam,{timeout:120000});
+await p.waitForTimeout(4000);
+const r=await p.evaluate(()=>{const G=__cam.G,z=G.zones.filter(z=>z.type==='town')[1];if(!z)return 'no city';Object.assign(__cam.cam,{x:z.x,z:z.z+4,d:70,pitch:.75,yaw:.3});__cam.applyCam();return z.name;});
+console.log(r);await p.waitForTimeout(5000);await p.screenshot({path:out+'_a.png'});
+await p.evaluate(()=>{const c=__cam.cam;c.d=36;c.pitch=.55;__cam.applyCam();});
+await p.waitForTimeout(4000);await p.screenshot({path:out+'_b.png'});
+console.log(errs.slice(0,3));await b.close();})();

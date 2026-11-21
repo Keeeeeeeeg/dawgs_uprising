@@ -1,0 +1,24 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+h=h.replace('let selected=new Set(),groups={}','let selected=new Set(),groups={};window.__selS=()=>selected;let __x0');fs.writeFileSync('/tmp/ct/rv.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760},deviceScaleFactor:1.5});p.setDefaultTimeout(300000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message+' @ '+(e.stack||'').split('\n').slice(1,3).join(' | ')));p.on('console',m=>{const t=m.text();if(/WebGLProgram|shader error/i.test(t))errs.push('CONSOLE '+t.slice(0,300));});
+await p.goto('file:///tmp/ct/rv.html');await p.waitForTimeout(1500);await p.evaluate(()=>{document.querySelector('#hordeBtn').click();});await p.waitForTimeout(600);
+await p.evaluate(()=>{const f=document.querySelector('#hordeFog');if(f.checked)f.click();document.querySelector('#hordeStart').click();});await p.waitForFunction(()=>window.__cam&&window.__cam.G,null,{timeout:250000});await p.waitForTimeout(8000);
+await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.home];G.horde.t=1e9;window.X=z.x+40;window.Z=z.z-60;
+  window.S=[];['rifle','mg','at','sniper','flagb'].forEach((t,i)=>{const u=G.spawnUnit(t,0,X+i*6,Z);u.ang=-Math.PI/2;S.push(u);});S[4].waving=true;
+  const HF=G.factions.length-1;window.E=G.spawnUnit('brute',HF,X+12,Z-26);E.hp=E.maxHp=1e7;E.speed=0;E.def=Object.assign({},E.def,{dmg:0});
+  window.M=G.spawnUnit('rifle',0,X-20,Z+10);
+  window.go=()=>G.applyCmd(0,{k:'order',kind:'move',ids:[M.id],a:X+20,b:Z+10});
+  window.step=n=>{for(let i=0;i<n;i++)G.update(.05);};});
+const shot=async(n,x,z,d,pitch,yaw)=>{await p.evaluate(([x,z,d,pitch,yaw])=>{const c=__cam.cam;c.x=x;c.z=z;c.d=d;c.pitch=pitch;c.yaw=yaw;__cam.applyCam();},[x,z,d,pitch,yaw]);await p.waitForTimeout(300);await p.screenshot({path:'/tmp/ct/sq_'+n+'.png'});};
+await p.evaluate(()=>{step(40);const q=__selS();for(const u of S)q.add(u.id);q.add(M.id);});await p.waitForTimeout(2000);
+let X=await p.evaluate(()=>X),Z=await p.evaluate(()=>Z);
+await shot('fire',X+12,Z+1,16,.55,-.3);await shot('snp',X+18,Z+1,5,.35,-.6);await shot('flag',X+24,Z+1,5,.3,-.6);
+await p.evaluate(()=>{const G=__cam.G;G.damage(S[0],S[0].maxHp*.55,1,S[0].x,S[0].z-5);G.damage(S[1],S[1].maxHp*.6,1,S[1].x,S[1].z-5);G.damage(S[4],S[4].maxHp*.6,1,S[4].x,S[4].z-5);G.damage(M,M.maxHp*.3,1,M.x,M.z);});await p.evaluate(()=>{const G=__cam.G;G.update(.05);});
+await p.evaluate(()=>{const G=__cam.G;for(const u of S)G.damage?0:0;});
+await p.evaluate(()=>step(30));await p.waitForTimeout(1500);await shot('after',X+12,Z+1,16,.55,-.3);console.log(await p.evaluate(()=>JSON.stringify(S.map(u=>[u.type,u.sqN,u.sqM,Math.round(u.hp),u.maxHp,u.ghK&&+u.ghK.toFixed(2)]))));
+await p.evaluate(()=>go());
+for(let i=0;i<3;i++){await p.evaluate(()=>step(12));await p.waitForTimeout(600);const q=await p.evaluate(()=>[M.x,M.z]);await shot('run'+i,q[0],q[1],6,.45,-1.2);}
+console.log(JSON.stringify(errs.slice(0,5)));await b.close();})();

@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/f.html',h);const out=process.argv[3];
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});p.setDefaultTimeout(120000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/ct/f.html');await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam);
+await p.waitForTimeout(4000);
+console.log(await p.evaluate(()=>{const G=__cam.G,z=G.zones.find(z=>z.type==='fortress');z.drill=3;z.owner=0;
+  const us=[];for(let i=0;i<12;i++)us.push(G.spawnUnit('rifle',0,z.x+2+i*.3,z.z+1));G.applyCmd(0,{k:'man',zid:z.id,ids:us.map(u=>u.id)});for(let s=0;s<40;s+=.25)G.update(.25);
+  window.__z=z;Object.assign(__cam.cam,{x:z.x,z:z.z,d:80,pitch:.9,yaw:.4});__cam.applyCam();return z.name+' r '+z.r;}));
+await p.waitForTimeout(5000);await p.screenshot({path:out+'.png',clip:{x:0,y:0,width:1280,height:450}});
+await p.evaluate(()=>{Object.assign(__cam.cam,{d:30,pitch:.6});__cam.applyCam();});await p.waitForTimeout(4000);await p.screenshot({path:out+'2.png',clip:{x:0,y:0,width:1280,height:450}});
+console.log(errs.slice(0,3));await b.close();})();

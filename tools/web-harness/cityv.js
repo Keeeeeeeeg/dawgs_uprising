@@ -1,0 +1,13 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam(),get R(){return renderer;},get S(){return scene;}};");
+fs.writeFileSync('/tmp/ct/pf.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/ct/pf.html');await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam,null,{timeout:120000});
+await p.waitForTimeout(4000);
+const r=await p.evaluate(()=>{const G=__cam.G,z=G.zones.find(q=>q.city);if(!z)return 'nocity';const c=__cam.cam;c.x=z.x;c.z=z.z;c.d=70;c.pitch=.6;c.yaw=.7;__cam.applyCam();
+  let c2=document.querySelector('canvas');while(c2&&c2!==document.body){for(const e of c2.parentElement.children)if(e!==c2&&e.tagName!=='SCRIPT')e.style.visibility='hidden';c2=c2.parentElement;}return z.name+' '+z.owner;});
+await p.waitForTimeout(9000);await p.screenshot({path:'/tmp/ct/city.png'});
+console.log(JSON.stringify(r,null,1));console.log(errs.slice(0,3));await b.close();})();

@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/camdbg.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+await p.goto('file:///tmp/camdbg.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForFunction(()=>window.__cam);
+await p.waitForTimeout(3000);
+console.log(await p.evaluate(()=>JSON.stringify(__cam.cam)));
+await p.evaluate(()=>{const z=__cam.G.zones.find(z=>z.type==='fortress');Object.assign(__cam.cam,{x:z.x,z:z.z,d:40,pitch:.9});__cam.applyCam();});
+await p.waitForTimeout(1500);console.log(await p.evaluate(()=>JSON.stringify(__cam.cam)));await p.screenshot({path:'camdbg.png'});await b.close();})();

@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},get meshes(){return meshes;},get UGEO(){return UGEO;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/dg.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:900,height:600}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/ct/dg.html');await p.waitForTimeout(1500);await p.evaluate(()=>{document.querySelector('#hordeBtn').click();});await p.waitForTimeout(600);
+await p.evaluate(()=>{document.querySelector('#hordeStart').click();});await p.waitForFunction(()=>window.__cam&&window.__cam.G,null,{timeout:300000});await p.waitForTimeout(6000);
+const out=await p.evaluate(()=>{const U=__cam.UGEO,o={};for(const t in U){const g=U[t][0];if(!g||!g.attributes)continue;const P=g.attributes.position,ix=g.index;const a=[];
+  if(ix){for(let i=0;i<ix.count;i++){const k=ix.getX(i);a.push(+P.getX(k).toFixed(4),+P.getY(k).toFixed(4),+P.getZ(k).toFixed(4));}}else for(let i=0;i<P.count;i++)a.push(+P.getX(i).toFixed(4),+P.getY(i).toFixed(4),+P.getZ(i).toFixed(4));o[t]=a;}return o;});
+fs.writeFileSync('/tmp/ct/geo.json',JSON.stringify(out));console.log(Object.keys(out).length,errs.slice(0,3));await b.close();})();

@@ -1,0 +1,13 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/he.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/ct/he.html');await p.waitForTimeout(1500);await p.evaluate(()=>{SIM.BALANCE.horde.waves=1;SIM.BALANCE.horde.prep=3;document.querySelector('#hordeBtn').click();});await p.waitForTimeout(600);
+await p.evaluate(()=>document.querySelector('#hordeStart').click());await p.waitForFunction(()=>window.__cam&&window.__cam.G,null,{timeout:300000});
+await p.waitForTimeout(14000);await p.evaluate(()=>{__cam.G.horde.t=.2;});await p.waitForFunction(()=>__cam.G.horde.phase==='wave',null,{timeout:200000});await p.waitForTimeout(1500);
+await p.evaluate(()=>{const G=__cam.G;G.horde.queue=[];for(const u of G.units)if(u.f===G.horde.f&&!u.def.struct)u.alive=false;});
+await p.waitForFunction(()=>__cam.G.over,null,{timeout:60000});await p.waitForTimeout(2500);await p.screenshot({path:'/tmp/ct/he_end.png'});
+await p.evaluate(()=>document.querySelector('#againBtn').click());await p.waitForTimeout(6000);await p.screenshot({path:'/tmp/ct/he_cont.png'});
+console.log(await p.evaluate(()=>({over:__cam.G.over,phase:__cam.G.horde.phase,t:Math.round(__cam.G.horde.t),time:Math.round(__cam.G.time)})),errs.slice(0,4));await b.close();})();

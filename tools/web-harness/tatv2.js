@@ -1,0 +1,17 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam(),get R(){return renderer;},get S(){return scene;},get ZV(){return zoneVis;},get R(){return renderer;},TAT:()=>TATTER,FT:(z,v)=>flagTatter(z,v)};");
+fs.writeFileSync('/tmp/ct/pf.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/ct/pf.html');await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam,null,{timeout:120000});
+await p.waitForTimeout(4000);
+const shot=await p.evaluate(()=>{const G=__cam.G,z=G.zones.find(q=>q.owner===0),v=__cam.ZV[z.id],out=[];
+  const cloth=v.flag.children.find(o=>o.isMesh&&o.material===v.clothMat)||v.flag.children.find(o=>o.isMesh);
+  const R=__cam.R,sc=new THREE.Scene();sc.background=new THREE.Color(0x8a9aa8);sc.add(new THREE.AmbientLight(0xffffff,1));const cam=new THREE.OrthographicCamera(-.2,2.6,1,-1,-10,10);cam.position.set(0,0,5);
+  for(const lv of [0,1,2,3]){const m=v.clothMat.clone();m.alphaMap=__cam.TAT()[lv]||null;m.alphaTest=lv?.5:0;m.side=THREE.DoubleSide;const mesh=new THREE.Mesh(cloth.geometry,m);sc.add(mesh);R.setRenderTarget(null);
+    R.render(sc,cam);out.push(R.domElement.toDataURL());sc.remove(mesh);}return out;});
+const fsx=require('fs');shot.forEach((d,i)=>fsx.writeFileSync('/tmp/ct/tat'+i+'.png',Buffer.from(d.split(',')[1],'base64')));
+const r=1;
+console.log(JSON.stringify(r,null,1));console.log(errs.slice(0,3));await b.close();})();
