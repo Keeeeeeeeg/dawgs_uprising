@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace("const cam=Object.assign({pitch:.98},CAM0());","const cam=Object.assign({pitch:.98},CAM0());window.__cam={cam,get G(){return G;},applyCam:()=>applyCam(),proj:(x,y,z)=>proj(x,y,z)};");
+fs.writeFileSync('/tmp/upg.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1600,height:860}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/upg.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForFunction(()=>window.__cam);
+await p.click('#planGo').catch(()=>{});
+const pt=await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.homes[0]];G.factions[0].money=3000;__cam.cam.x=z.x;__cam.cam.z=z.z;__cam.cam.d=80;__cam.applyCam();const q=__cam.proj(z.x,z.y,z.z);return [q.x,q.y];});
+await p.waitForTimeout(600);await p.mouse.click(pt[0],pt[1]);await p.waitForTimeout(500);
+await p.evaluate(()=>{const b=document.querySelector('[data-tab="upgrades"]');b&&b.click();});await p.waitForTimeout(300);
+await p.evaluate(()=>{for(const c of ['drill','hosp']){const b=document.querySelector(`[data-cmd="${c}"]`);b&&b.click();}});
+await p.waitForTimeout(4000);await p.screenshot({path:'upg.png'});
+console.log(await p.evaluate(()=>document.querySelector('#cardTabs').innerText.replace(/\n/g,' | ')),errs.slice(0,3));await b.close();})();

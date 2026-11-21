@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace("const cam=Object.assign({pitch:.98},CAM0());","const cam=Object.assign({pitch:.98},CAM0());window.__cam={cam,get G(){return G;},applyCam:()=>applyCam(),proj:(x,y,z)=>proj(x,y,z)};");
+fs.writeFileSync('/tmp/cb.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/cb.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForFunction(()=>window.__cam);
+const pt=await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.homes[0]],bk=z.plots.find(p=>p.fac.type==='barracks');__cam.cam.x=bk.x;__cam.cam.z=bk.z;__cam.cam.d=60;__cam.applyCam();const q=__cam.proj(bk.x,bk.y+1.2,bk.z);return [q.x,q.y];});
+await p.waitForTimeout(800);await p.mouse.click(pt[0],pt[1]);await p.waitForTimeout(600);
+await p.screenshot({path:'clickb.png'});console.log(await p.evaluate(()=>document.querySelector('#cardTop').innerText+' || '+[...document.querySelectorAll('#cardGrid .cb .n')].map(e=>e.textContent).join(',')));
+console.log(errs);await b.close();})();

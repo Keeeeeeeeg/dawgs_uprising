@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace("const cam=Object.assign({pitch:.98},CAM0());","const cam=Object.assign({pitch:.98},CAM0());window.__cam={cam,get G(){return G;},T:TRANSIT,lineAt,applyCam:()=>applyCam(),sel:ids=>{selected=new Set(ids);refreshSel();}};");
+fs.writeFileSync('/tmp/ship.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/ship.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);
+await p.evaluate(m=>{const c=[...document.querySelectorAll('#mapCards [data-map], #mapCards button, #mapCards .mapcard')].find(e=>(e.dataset.map||'')===m||e.textContent.toLowerCase().includes(m));if(c)c.click();},process.argv[3]||'brine');
+await p.click('#startGame');await p.waitForFunction(()=>window.__cam);await p.waitForTimeout(800);
+console.log(await p.evaluate(()=>JSON.stringify(__cam.T.sea.map(l=>Math.round(l.len)))));
+await p.evaluate(()=>{const L=__cam.T.sea[0];const q=__cam.lineAt(L,L.len*.3);__cam.cam.x=q.x;__cam.cam.z=q.z;__cam.cam.d=60;__cam.applyCam();});
+await p.waitForTimeout(2500);await p.screenshot({path:'ship.png'});
+await p.evaluate(()=>{const G=__cam.G;const rv=G.units.find(u=>u.f===0&&u.def.builder);__cam.sel([rv.id]);});await p.waitForTimeout(600);
+await p.evaluate(()=>{const b=document.querySelector('[data-cat="eco"]');b&&b.click();});await p.waitForTimeout(300);await p.screenshot({path:'cat.png',clip:{x:700,y:440,width:580,height:320}});
+console.log(errs);await b.close();})();

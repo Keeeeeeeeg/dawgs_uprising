@@ -1,0 +1,15 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/rv.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760},deviceScaleFactor:1.5});p.setDefaultTimeout(300000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{const t=m.text();if(/WebGLProgram|shader error/i.test(t))errs.push('CONSOLE '+t.slice(0,300));});
+await p.goto('file:///tmp/ct/rv.html');await p.waitForTimeout(1500);await p.evaluate(()=>{document.querySelector('#hordeBtn').click();});await p.waitForTimeout(600);
+await p.evaluate(()=>{const f=document.querySelector('#hordeFog');if(f.checked)f.click();document.querySelector('#hordeStart').click();});await p.waitForFunction(()=>window.__cam&&window.__cam.G,null,{timeout:250000});await p.waitForTimeout(8000);
+await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.home];G.horde.t=1e9;window.X=z.x+40;window.Z=z.z-60;
+  window.FL=G.spawnUnit('flamer',0,X,Z);const HF=G.factions.length-1;window.E=[];for(let i=0;i<3;i++){const e=G.spawnUnit('husk',HF,X+9+i,Z+i*1.5);e.hp=e.maxHp=1e7;e.emerge=null;e.rise=null;e.def=Object.assign({},e.def,{speed:0});E.push(e);}});
+const shot=async(n,x,z,d,pitch,yaw)=>{await p.evaluate(([x,z,d,pitch,yaw])=>{const c=__cam.cam;c.x=x;c.z=z;c.d=d;c.pitch=pitch;c.yaw=yaw;__cam.applyCam();},[x,z,d,pitch,yaw]);await p.waitForTimeout(300);await p.screenshot({path:'/tmp/ct/fj_'+n+'.png'});};
+await p.waitForTimeout(2500);
+let X=await p.evaluate(()=>X),Z=await p.evaluate(()=>Z);
+await p.evaluate(()=>{window.__sc=0;__cam.G.on('shot',(u,q)=>{if(u===FL)window.__sc++;});});await p.waitForTimeout(9000);console.log(await p.evaluate(()=>{const G=__cam.G;return JSON.stringify({fl:[FL.x|0,FL.z|0,FL.f,FL.def.range,FL.cd,FL.built,FL.static],e:E.map(e=>[e.x|0,e.z|0,e.f,e.alive,G.hostile(FL.f,e.f),!!e.emerge,e.hidden,e.burrow]) ,keys:Object.keys(FL).join(',')});}));console.log(await p.evaluate(()=>'shots '+__sc+' quiet? jets '+window.__JETS.size+' FL '+FL.alive+' tgt '+(FL.target&&FL.target.type)));console.log(await p.evaluate(()=>{const J=[...window.__JETS.values()];return JSON.stringify(J.map(j=>({k:j.k,vis:j.m.visible,A:j.m.material.uniforms.A.value,B:j.m.material.uniforms.B.value,C:j.m.material.uniforms.C.value,w:j.m.material.uniforms.uW.value})));}));await p.waitForTimeout(2500);await shot('a',X+4,Z+1,16,.3,1.57);await p.waitForTimeout(400);await shot('b',X+6,Z,18,.7,.6);
+console.log(JSON.stringify(errs.slice(0,5)));await b.close();})();

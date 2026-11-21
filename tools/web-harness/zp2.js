@@ -1,0 +1,21 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam(),FX:CITY_FX};");
+fs.writeFileSync('/tmp/ct/h.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:900,height:560}});p.setDefaultTimeout(400000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/ct/h.html');await p.waitForTimeout(1500);await p.evaluate(()=>document.querySelector('#playBtn').click());await p.waitForTimeout(3000);await p.evaluate(()=>document.querySelector('#startGame').click());await p.waitForFunction(()=>window.__cam);
+await p.waitForTimeout(8000);
+await p.evaluate(()=>{const G=__cam.G;const h=G.zones[G.homes[0]];let x=h.x,z=h.z;for(let a=0;a<6.28;a+=.2){const X=h.x+Math.cos(a)*45,Z=h.z+Math.sin(a)*45;let ok=true;for(let i=-14;i<=14;i+=2)for(let j=-14;j<=14;j+=2)if(!G.passable(X+i,Z+j)||G.heightAt(X+i,Z+j)<1)ok=false;if(ok){x=X;z=Z;break;}}
+  const v=G.spawnUnit('airship',0,x,z);v.ang=.3;window.__v=v;for(let i=0;i<4;i++)G.spawnUnit(i%2?'mtank':'rifle',1,x+(i-2)*4,z+30);G.spawnUnit('lheli',1,x+10,z-20);G.spawnUnit('lheli',1,x-12,z+18);
+  window.__adv=n=>{for(let i=0;i<n;i++)G.update(.25);};
+  const Y=G.unitY(v),p=.42;const L=()=>{const t={x:v.alive?v.x:window.__fx,z:v.alive?v.z:window.__fz};const o=Y/Math.tan(p)-30,yw=.9;Object.assign(__cam.cam,{x:t.x-Math.sin(yw)*o,z:t.z-Math.cos(yw)*o,d:(Y+16)/Math.sin(p),pitch:p,yaw:yw});__cam.applyCam();requestAnimationFrame(L);};L();});
+await p.evaluate(()=>{for(const e of document.body.querySelectorAll('*')){if(e.tagName==='CANVAS'||e.querySelector('canvas'))continue;const cs=getComputedStyle(e);if(cs.position==='fixed'||cs.position==='absolute')e.style.visibility='hidden';}});
+await p.waitForTimeout(3000);await p.evaluate(()=>__adv(14));await p.waitForTimeout(2500);
+await p.screenshot({path:'zp0.png',clip:{x:60,y:20,width:780,height:500},timeout:400000});console.log('k0');
+await p.evaluate(()=>{__v.hp=__v.maxHp*.2;__adv(4);});await p.waitForTimeout(3000);
+await p.screenshot({path:'zp1.png',clip:{x:60,y:20,width:780,height:500},timeout:400000});console.log('k1');
+await p.evaluate(()=>{window.__fx=__v.x;window.__fz=__v.z;__v.hp=1;__cam.G.spawnUnit('sam',1,__v.x+15,__v.z);__cam.G.spawnUnit('flak',1,__v.x-15,__v.z);__adv(8);});
+await p.waitForTimeout(3000);await p.screenshot({path:'zp2.png',clip:{x:60,y:20,width:780,height:500},timeout:400000});console.log('k2',await p.evaluate(()=>__v.alive));
+console.log(errs.slice(0,3));await b.close();})();

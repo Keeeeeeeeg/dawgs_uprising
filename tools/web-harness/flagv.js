@@ -1,0 +1,10 @@
+const {chromium}=require('playwright');const fs=require('fs');
+fs.writeFileSync('/tmp/ct/b.html',fs.readFileSync(process.argv[2],'utf8'));
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('file:///tmp/ct/b.html');await p.waitForTimeout(2500);
+await p.evaluate(()=>{const c=document.createElement('canvas');c.width=900;c.height=330;c.style.cssText='position:fixed;left:0;top:0;z-index:99999;background:#555';document.body.appendChild(c);const x=c.getContext('2d');
+ FLAGS.draw(x,'ash',10,10,420,280,1);FLAGS.draw(x,'ash',450,10,180,120,2);FLAGS.draw(x,'storm',450,150,180,120,1);FLAGS.emblem(x,'ash',740,80,70);FLAGS.emblem(x,'ash',740,240,24);});
+await p.screenshot({path:'/tmp/ct/flag_ash.png',clip:{x:0,y:0,width:900,height:330}});
+await p.screenshot({path:'/tmp/ct/menu_ash.png'});console.log(errs);await b.close();})();

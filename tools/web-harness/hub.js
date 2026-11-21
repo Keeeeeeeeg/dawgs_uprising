@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file://'+require('path').resolve(process.argv[2]));await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForTimeout(2500);
+await p.click('#planGo').catch(()=>{});await p.waitForTimeout(800);
+const names=()=>p.evaluate(()=>document.querySelector('#cardTop').innerText.replace(/\n/g,' ')+' || '+[...document.querySelectorAll('#cardGrid .cb .n')].map(e=>e.textContent).join(','));
+console.log('hub',await names());await p.screenshot({path:'hub0.png',clip:{x:700,y:440,width:580,height:320}});
+await p.keyboard.press('z');await p.waitForTimeout(600);console.log('toast',await p.evaluate(()=>{const t=document.querySelector('.toast,#toast');return t?t.innerText:'?'}));
+await p.evaluate(()=>document.querySelector('[data-goplot]').click());await p.waitForTimeout(900);console.log('bld',await names());
+await p.keyboard.press('z');await p.waitForTimeout(300);await p.evaluate(()=>document.querySelector('[data-rec="mg"]').click());await p.waitForTimeout(900);
+await p.screenshot({path:'hub1.png',clip:{x:700,y:440,width:580,height:320}});
+console.log(errs.slice(0,3));await b.close();})();

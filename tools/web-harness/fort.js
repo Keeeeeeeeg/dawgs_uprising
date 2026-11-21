@@ -1,0 +1,14 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace("const cam=Object.assign({pitch:.98},CAM0());","const cam=Object.assign({pitch:.98},CAM0());window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/fort.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/fort.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForFunction(()=>window.__cam);
+await p.click('#planGo').catch(()=>{});
+await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.homes[0]];G.factions[0].money=5000;G.applyCmd(0,{k:'drill',zid:z.id});G.applyCmd(0,{k:'hosp',zid:z.id});
+  __cam.cam.x=z.x;__cam.cam.z=z.z;__cam.cam.d=95;__cam.applyCam();});
+await p.waitForTimeout(1500);await p.screenshot({path:'fort0.png'});
+await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.homes[0]];for(let i=0;i<400;i++)G.update(.1);G.applyCmd(0,{k:'drill',zid:z.id});for(let i=0;i<500;i++)G.update(.1);});
+await p.waitForTimeout(1500);await p.screenshot({path:'fort3.png'});
+console.log(await p.evaluate(()=>{const z=__cam.G.zones[__cam.G.homes[0]];return [z.drill,z.hosp,z.owner];}),errs.slice(0,3));await b.close();})();

@@ -1,0 +1,26 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/fort2.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760}});
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());
+const errs=[];p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('file:///tmp/fort2.html');await p.waitForTimeout(1200);await p.click('#playBtn');await p.waitForTimeout(400);await p.click('#startGame');await p.waitForFunction(()=>window.__cam);
+await p.click('#planGo').catch(()=>{});
+const drill=+(process.argv[3]||1);
+console.log(await p.evaluate(drill=>{const G=__cam.G;const z=G.zones.find(z=>z.type==='fortress');window.__z=z;
+  for(const u of G.units)if(u.garrison===z.id)u.alive=false;
+  z.owner=0;z.drill=drill;z.contested=false;z.drillUp={t:0,T:1e9};setTimeout(()=>{z.drillUp=null;},300);
+  const us=[];for(let i=0;i<8;i++)us.push(G.spawnUnit(i%3?'rifle':'mg',0,z.x+18,z.z+18+i));us.push(G.spawnUnit('how',0,z.x+20,z.z+20));us.push(G.spawnUnit('spg',0,z.x+21,z.z+21));
+  const r=G.applyCmd(0,{k:'man',zid:z.id,ids:us.map(u=>u.id)});for(let t=0;t<40;t+=.25)G.update(.25);
+  window.__w=(lx,lz)=>G.fortW(z,lx,lz);
+  return [z.name,z.gate,r,us.map(u=>u.man&&u.man.ph).join(',')];},drill));
+const shot=async(f,d,pitch,lx,lz,yaw)=>{await p.evaluate(([d,pitch,lx,lz,yaw])=>{const w=__w(lx,lz);Object.assign(__cam.cam,{x:w.x,z:w.z,d,pitch});if(yaw!=null)__cam.cam.yaw=yaw;__cam.applyCam();},[d,pitch,lx,lz,yaw]);await p.waitForTimeout(1300);await p.screenshot({path:f+'.png',clip:{x:0,y:0,width:1280,height:445}});};
+await shot('f_over'+drill,44,.95,0,0);
+await shot('f_wall'+drill,22,.75,2,7);
+// a rover from the bay and a heli from the pad
+await p.evaluate(()=>{const G=__cam.G,z=__z;G.factions[0].money=9999;const u=G.spawnUnit('ltank',0,z.x,z.z);G.emergeAt(u,z,G.exitSpot(z,'ltank'));const h=G.spawnUnit('heli',0,z.x,z.z);G.emergeAt(h,z,G.exitSpot(z,'heli'));window.__u=[u,h];});
+await shot('f_bay'+drill,20,.7,0,0);
+await p.waitForTimeout(800);await shot('f_bay2'+drill,20,.7,0,0);
+console.log(await p.evaluate(()=>__u.map(u=>u.emerge&&u.emerge.k+':'+u.emerge.t.toFixed(1)).join(' ')));
+console.log(errs.slice(0,3));await b.close();})();

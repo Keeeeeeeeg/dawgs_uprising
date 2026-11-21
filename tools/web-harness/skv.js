@@ -1,0 +1,21 @@
+const {chromium}=require('playwright');const fs=require('fs');
+let h=fs.readFileSync(process.argv[2],'utf8');h=h.replace(/const cam=Object.assign\(\{pitch:.98(,yaw:0)?\},CAM0\(\)\);/,m=>m+"window.__cam={cam,get G(){return G;},applyCam:()=>applyCam()};");
+fs.writeFileSync('/tmp/ct/rv.html',h);
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:1280,height:760},deviceScaleFactor:1.5});p.setDefaultTimeout(300000);
+await p.route('**/three.min.js',r=>r.fulfill({path:__dirname+'/three/package/build/three.min.js',contentType:'application/javascript'}));
+await p.route('**/fonts.googleapis.com/**',r=>r.abort());const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{const t=m.text();if(/WebGLProgram|shader error/i.test(t))errs.push('CONSOLE '+t.slice(0,300));});
+await p.goto('file:///tmp/ct/rv.html');await p.waitForTimeout(1500);await p.evaluate(()=>{document.querySelector('#hordeBtn').click();});await p.waitForTimeout(600);
+await p.evaluate(()=>{const f=document.querySelector('#hordeFog');if(f.checked)f.click();document.querySelector('#hordeStart').click();});await p.waitForFunction(()=>window.__cam&&window.__cam.G,null,{timeout:250000});await p.waitForTimeout(8000);
+await p.evaluate(()=>{const G=__cam.G,z=G.zones[G.home];G.horde.t=1e9;window.X=z.x+40;window.Z=z.z-60;window.S=[];
+  ['rifle','mg','at','rifle'].forEach((t,i)=>{const u=G.spawnUnit(t,0,X+i*1.6,Z);u.ang=-Math.PI/2;S.push(u);});
+  window.M=[];['rifle','rifle','at'].forEach((t,i)=>{const u=G.spawnUnit(t,0,X-14+i*1.4,Z+8);M.push(u);});
+  const HF=G.factions.length-1;window.E=G.spawnUnit('brute',HF,X+3,Z-16);E.hp=E.maxHp=1e7;E.speed=0;
+  window.go=()=>G.applyCmd(0,{k:'order',kind:'move',ids:M.map(u=>u.id),a:X+40,b:Z+8});});
+const shot=async(n,x,z,d,pitch,yaw)=>{await p.evaluate(([x,z,d,pitch,yaw])=>{const c=__cam.cam;c.x=x;c.z=z;c.d=d;c.pitch=pitch;c.yaw=yaw;__cam.applyCam();},[x,z,d,pitch,yaw]);await p.waitForTimeout(250);await p.screenshot({path:'/tmp/ct/sk_'+n+'.png'});};
+await p.waitForTimeout(3000);
+let X=await p.evaluate(()=>X),Z=await p.evaluate(()=>Z);
+await shot('fire',X+2.4,Z-1,2.6,.18,-.5);
+await shot('fire2',X+2.4,Z,2.6,.2,1.2);
+await p.evaluate(()=>go());
+for(let i=0;i<4;i++){await p.waitForTimeout(400);const q=await p.evaluate(()=>[M[0].x,M[0].z]);await shot('run'+i,q[0]+.4,q[1],2.4,.15,-1.4);}
+console.log(JSON.stringify(errs.slice(0,5)));await b.close();})();
