@@ -1,48 +1,82 @@
-# Keegan's backlog (after 26.15 Dug In, 2026-11-26)
+# Keegan's backlog (after 26.17 Footing, 2026-11-26)
 
-Every item here was requested by Keegan in his session. The details of the destruction pass are in `destruction-plan.md`.
+Every item here was requested by Keegan in his session. The details of the destruction pass are in `destruction-plan.md`. Design language from Keegan's reference images: `3D Objects/DawgsUprising/references/DESIGN_LANGUAGE.md` (12 vehicle and location references next to it).
 
 ## Standing rules (from Keegan)
-- **Real textures always.** Every new or reworked asset uses scanned CC0 textures (Poly Haven / ambientCG), plus a shared hand-made UNSC trim sheet (bolts, vents, panel seams, stencils, hazard strips). No more flat-coloured blocks.
+- **Real textures always, weathered.** Every new or reworked asset uses scanned CC0 textures (Poly Haven / ambientCG) plus a shared UNSC trim sheet, with a weathered look: darker lower third, edge wear, dust and stains. No flat-coloured blocks. In the code, `weatherize(mat, tex, mean, {scale, k, grime})` (26.16) adds world-space triplanar scanned detail and grime to any material.
 - **Procedural generation.** Prefabs and their placement are rule- and seed-driven so they work on any map. Hand-placed overrides are allowed for story maps.
-- **Art style.** UNSC deployed prefab, made elsewhere and set down here. A mix of Halo Wars 1 and the Halo Reach colony look: realistic but stylised, with bold silhouettes, and a **lived-in** feel.
-- **Infantry must never skate or clip.** Animations use foot locking. Units are visible while they shoot, take cover and move.
-- **QA gates on every asset (run by script before Keegan sees anything):**
-  - Nothing floating: every part rests on the ground or on another part.
-  - No flipped or mirrored textures or stencils.
-  - Lights make sense: door lamps over doors, floodlights aimed at work areas, beacons on mast tops.
-  - Close-up turntables (front, side, 3/4, close-up) at game-camera distance, not only sheets.
-  - Reference images from Keegan's `3D Objects/DawgsUprising/references` folder.
+- **Art style.** UNSC deployed prefab, made elsewhere and set down here, in a Halo Wars 1 and Halo Reach colony mix with a **lived-in** feel. See DESIGN_LANGUAGE.md for the details: faceted slab-armour vehicles, olive paint with stencils and one accent stripe, pod-and-catwalk outposts.
+- **Infantry must never skate or clip.** Visible in and out of cover and buildings.
+- **QA gates on every asset:** nothing floating, no flipped textures, lights placed sensibly, close-up turntables, checked against the reference images.
 
-## Outpost direction (Keegan 11-26): semi-prefab locations in the style of Helldivers 2
-- Locations are built from hand-made kits that snap together by rule: modules with sockets for doors, annexes, barrier lines and lights. A lived-in clutter layer goes on top: cable runs, crates and fuel cells by doors, tyre ruts, worn paths, lights on poles, litter.
-- **Size tiers per map:** mostly small (1-3 modules) and medium (4-7 modules with entrenchments), plus **one large landmark** (a ring farm or relay station). They must not compete with the bases.
-- **Entrenched positions, all part of the generator:** trench runs (revetted with sheet steel and sandbags), gun pits, deployable barrier lines with firing slits, and garrisonable prefab bunkers. These are the same cover points the cover system uses.
-- **Farms become Halo Reach ring farms:** concentric crop rings about **60 m across** (2-3 rings) with a sweeping centre-pivot irrigation arm and a hub of space-colony equipment.
-- **Sensor relay:** an original design in the spirit of the Helldivers 2 lidar node, in the colony-prefab style. Watchtower-style vision while held; a ping that reveals any spot on the map, with a cooldown.
-- **Universal positions system (agreed 11-26):** one snap/cover system built from the wall-manning code and applied to every structure. Positions carry facing, stance, cover value, firing arc and access; they degrade with damage; the AI scores them the same way; exported from Blender as `POS_*` empties. Hero-piece approach: one asset taken to final quality first as the reference for the rest.
+## Outpost direction: semi-prefab locations in the style of Helldivers 2
+(unchanged; see the 26.15 notes) Small and medium kits plus one large landmark. Entrenchments are built into the generator. Ring farms, the sensor relay, and the universal positions/cover system built from the wall-manning code, using the hero-piece approach.
 
-## Shipped overnight (11-26)
-- **26.12 Hardstand:** scanned concrete apron with expansion joints and stains; kerbs get scanned detail.
-- **26.13 Forest Floor:** leaf-litter floor under woods; dark contact patches at the foot of trunks.
-- **26.14 Brackets:** buildings get the stylised selection ring (picked building in city view, inspected enemy building, selected enemy/neutral base). Devtest has every biome: snow west, green middle, desert on the Airbase island, a wood in each.
-- **26.15 Dug In:**
-  - **Sensor Relay landmark**, one per map (not Horde, carrier or Moon), placed on the flat spot nearest the map centre with its own RNG stream (`seed^0x7e1a7`), so existing outposts don't move. Kind `relay` in `BALANCE.sites.kinds` (gar 2, vis); tuning in `BALANCE.relay` (visR 105, pingR 42, pingT 14 s, cd 90 s).
-  - Holding it (infantry inside → `q.relF`) gives the team sight of visR round it. **Relay ping** (V, button beside Missile) is the command `{k:'relayping',x,z}` → `G.reveals` stamped into both the player fog and the AI team grids. The AI pings the nearest hostile base it can't see.
-  - **Entrenchments:** `map.trenches` (segments, own RNG `seed^0x3e9c1`). A kinked trench in front of medium military outposts (65%) and two curved runs round the relay. Infantry in one take `BALANCE.entrench.coverInf` (0.5) of the damage (`G.inTrench`, cell grid). Drawn with scanned hessian sandbags (Poly Haven hessian_230), timber posts and a scanned dirt floor (`env/trench/`). Trees are kept out of them.
-  - The relay and trench art is placeholder until the round-4 concept pieces are built.
+## Shipped 11-26
+- **26.12 Hardstand**, **26.13 Forest Floor**, **26.14 Brackets**, **26.15 Dug In** (sensor relay + ping, entrenchments): see git history and the in-game changelog.
+- **26.16 Strike Art** (Andrew): loading screen art.
+- **26.17 Footing:**
+  - **Motion-captured locomotion.** The Mixamo Pro Rifle Pack, downloaded by Keegan to `Downloads/`, is retargeted onto our marine rig (legs, hips, spine, head; our arms keep the weapon grip) and stored in `anim/bank.js`: 48 clips as int16 quaternions, about 190 KB.
+    - `locoClip()` blends the 2 nearest of 8 directions × the 2 nearest gaits (walk/run/sprint, or crouch-walk while engaging).
+    - Every clip is phase-locked to the left heel strike. The phase advances by distance over the clip's own stride, so feet don't skate.
+    - The extractor is `/home/claude/anim/x/ex.html` (three r128 FBXLoader in Playwright): world-space delta from the Mixamo T-pose, C = Ry(90°), bind-direction correction.
+  - **Leg IK** (`legIK`): the hips drop to the downhill foot, analytic two-bone IK keeps the knee plane, the ankle tilts to the ground normal (capped at 30°), and stance feet are locked. Skipped on walls, decks, roofs, prone, swimming and climbing.
+  - **Ballistic missile renamed Tactical Nuke** (UI text and the Nuke Silo; internal names unchanged).
+  - **Forest litter:** only in green woods (4+ trees within 11 m), with ragged noise-broken edges.
+  - Build pads in scanned concrete.
+  - The flag-pole leftovers are removed (matched in world space).
+  - Cactus get a ribbed skin.
+  - Fallback rocks get the scanned rock texture.
 
-## Queue, in Keegan's order: art first, then behaviour
-1. **Concept round 5** from Keegan's reference images (he adds them to `references/`), using the hero-piece approach. Then sign-off → bake → swap out the blockouts (relay and trenches first).
-2. **Apron × craters:** craters break or alter the apron where they land (the fill on rebuild is done).
-3. **Visible garrisons with firing positions** (window/door/roof slots, visible shooters, roof fades on hover, door walk-in animation).
-4. **Universal positions / cover system** (see above). Trenches and gun pits become position sets. **Craters stay a small passive bonus only.**
-5. **Infantry animation bank:** Mixamo clips retargeted onto our marine rig with foot locking. Keegan needs a short walkthrough of how Mixamo works first.
-6. **Procedural kit assembly** (door faces the road, annexes on free sides, barriers toward the nearest base; biome/faction/wear dressing).
-7. **Environment:** bush card fix (still open).
-8. **Harbours and settlements near water:** quays, piers and seawalls, procedural, to the same apron and texture standard.
+## Queue (Keegan 11-26 afternoon, roughly in his order)
+1. **Infantry pass**
+   - **Ankles crazy on some kits:** the rocket team's kneeling loader shows a twisted rear foot. Fix the kneel pose per kit and check every template in close-up turntables.
+   - Weapon grips (hands on the weapon per kit), the rig, and full-resolution marine textures.
+   - **Three-man MG crews** (gunner, loader, spotter) with set-up and tear-down.
+   - **Flag bearer rework:** better model, a proper banner with cloth sway, a two-handed grip, and the plant/wave animation redone.
+   - **Boarding Marines' breacher shield:**
+     - collapsed into a tight hourglass silhouette while moving, unfolding when deployed;
+     - detail and style in our design language.
+   - **More clips into the bank** (`anim/bank.js`), as described below.
+     - Wire up the clips the bank already holds: deaths (6 directions), crouch turns and stand turns (for turning on the spot), jump up/loop/down (vaulting trenches and walls).
+     - Then add more from Mixamo: cover sneak left/right, shield-face and rub-eyes reactions, prone hit, kneel↔prone↔stand transitions, firing while walking/running, reload, grenade throw. Keegan downloads them in Chrome or Edge (the in-app browser can't save files).
+   - **Squads only:** roll the single-man **Deck Marine** into a regular rifle squad, and the single-man **Boarding Marine** into the Boarding Marines squad.
+   - Sounds and small details: footsteps per surface, gear rattle, reload and handling sounds.
+   - **Performance for crowds:** bake the clip bank into a vertex-animation texture so far squads animate on the GPU with instancing; full skinning plus IK only near the camera.
+2. **Biomes look consistent**
+   - **Desert:** sand-dune texture in some areas and exposed rough rock with wadis around the mountains. Cactus with real scanned detail and better shapes. Desert scrub instead of forest litter.
+   - **Arctic:** snow ground under the woods (no brown litter discs), snow-laden conifers, scanned snow and ice. **Icebergs** reshaped into natural forms (tall tabular cliffs with blue ice faces, wave-cut notches and small growlers; not low-poly domes) with a scanned ice texture and subsurface tint.
+   - **Shrubbery to modern RTS standard:** the current bushes read as flat cards and fronds. The approach:
+     - mesh clusters with alpha-tested cards from scanned plant atlases;
+     - normals bent to a sphere so lighting reads as one volume;
+     - a two-tone colour gradient from base to tip and wind sway;
+     - contact AO at the base;
+     - distance LOD, then an impostor;
+     - placement rules: shrubs cluster at wood edges, rocks and walls, not evenly sprinkled.
+3. **Buildings overhaul:** every building and its flat colours get scanned materials and weathering via `weatherize` and a UNSC trim sheet, then a per-building rework following DESIGN_LANGUAGE.md.
+4. **Wrecks use the real model:** anything dead on the map (the old box "heavy tank" wrecks and others) uses the in-game model of that unit, burnt (charred material, smoke and soot), not a stand-in.
+5. **Tactical nuke effect:**
+   - Today the mushroom cloud is a flat sprite that turns with the camera.
+   - Rebuild it as volumetric: a stack of noise-shaded spheres or particles with a rising stem, a rolling cap with an inner glow, a ground ring of dust (all camera-independent), heat haze and a shockwave.
+6. **Spawn-in clutter: placement rules.**
+   - The units a base spawns, and the facilities and props round a base, overlap and clip, so the design looks busy.
+   - Rules to add to the generator:
+     - keep-out footprints per building, pad and road;
+     - a spawn/rally apron per building, with units leaving along a lane;
+     - a minimum gap between pads;
+     - props only in designated clutter slots;
+     - spawned vehicles placed in free parking slots, never on top of each other;
+     - a clean road-facing front.
+7. **The concrete bunker prop becomes a small fortifiable location:** a colony-prefab mini outpost in the diffuse layout (a bunker module, a trench or sandbag ring, a gun pit, crates and a light), with snappable cover positions.
+8. **Concept round 5** from Keegan's reference images (now in `references/`), hero-piece first.
+9. Then the earlier queue:
+   - apron × craters
+   - visible garrisons with firing positions
+   - the universal positions/cover system
+   - procedural kit assembly
+   - harbours
 
 ## Known issues
-- A `computeBoundingSphere NaN` console warning appears on load (it predates 26.2). The source has not been found yet.
-- An occasional tree from the forest clusters can still stand at a trench edge (the exclusion covers the scattered trees only).
-- An own base selected shows the existing wall glow plus the pad ring; the big bracket ring is only for enemy/neutral bases.
+- A `computeBoundingSphere NaN` console warning appears on load (it predates 26.2).
+- An occasional tree from the forest clusters can stand at a trench edge.
+- The pack has two zips (`Pro Rifle Pack.zip`, `Rifle 8-Way Locomotion Pack.zip`) holding the same 49 clips. Some files only parse from one of them in the r128 FBXLoader, so the extractor takes each clip from whichever zip parses.
